@@ -130,3 +130,11 @@ input[type=color]{height:44px;padding:4px}
   .sectionhead h2{font-size:30px}.panel{padding:17px}
 }
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* Таймери спогадів і планів */
+.count{display:inline-block;margin-top:6px;padding:0 14px;font:700 23px/1.4 var(--hand);color:var(--rose);background:var(--rose2);border-radius:4px 12px 4px 12px;font-variant-numeric:tabular-nums}
+.count:empty{display:none}
+.moment.future{background:#fffdf6}
+.moment.future::after{content:'план';position:absolute;right:20px;top:20px;padding:0 12px;font:700 24px var(--hand);color:var(--rose);background:#fffdf6d9;border:2px solid var(--rose);border-radius:6px;transform:rotate(6deg)}
+.dream .count{font-size:20px}
+.nav button{font-size:21px}
