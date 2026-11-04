@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="uk">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff4f7">
+  <title>Наш час ❤️</title>
+  <style>
+    :root{--bg:#fff7f9;--ink:#49333d;--muted:#987d88;--pink:#e8799d;--pink-dark:#c9537b;--line:#f3dce4;--card:#fff;--shadow:0 14px 40px rgba(173,91,121,.10)}
+    *{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(ellipse at 12% 8%,#ffe4ed 0,transparent 32%),radial-gradient(ellipse at 90% 20%,#fce8f0 0,transparent 28%),var(--bg)}
+    button,input{font:inherit}button{cursor:pointer}.wrap{width:min(1060px,calc(100% - 32px));margin:0 auto;padding:34px 0 60px}.hero{text-align:center;padding:22px 12px 28px}.heart{font-size:34px;filter:drop-shadow(0 5px 8px #e9a6bb)}h1{font-family:Georgia,serif;font-size:clamp(38px,7vw,62px);font-weight:500;letter-spacing:-1.5px;margin:7px 0;color:#754457}.subtitle{font-family:Georgia,serif;font-size:clamp(16px,3vw,21px);font-style:italic;color:#a7788a;margin:0}.panel{background:rgba(255,255,255,.86);border:1px solid var(--line);border-radius:24px;padding:24px;box-shadow:var(--shadow);backdrop-filter:blur(8px)}.login{max-width:430px;margin:10px auto}.section-title{font-family:Georgia,serif;font-size:25px;font-weight:500;margin:0 0 17px;color:#754457}.field{display:flex;flex-direction:column;gap:7px;margin:12px 0}.field label{font-size:13px;color:var(--muted)}input{width:100%;border:1px solid var(--line);background:#fffafb;border-radius:12px;padding:12px 14px;color:var(--ink);outline:none}input:focus{border-color:#e89bb5;box-shadow:0 0 0 3px #fbe7ee}.btn{border:0;border-radius:12px;padding:12px 18px;background:var(--pink);color:#fff;font-weight:650;box-shadow:0 7px 16px rgba(213,104,143,.2);transition:.18s}.btn:hover{background:var(--pink-dark);transform:translateY(-1px)}.btn.secondary{background:#fff0f5;color:#a34d6d;box-shadow:none;border:1px solid var(--line)}.btn.danger{background:#fff0f0;color:#b64f60;box-shadow:none;border:1px solid #f4d5da}.btn.small{padding:8px 12px;font-size:13px}.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.row>*{flex:1}.error{color:#b7445c;font-size:13px;min-height:18px;margin-top:9px}.hidden{display:none!important}.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:20px}.topbar p{margin:0;color:var(--muted);font-size:14px}.add-panel{margin-bottom:24px}.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}.full{grid-column:1/-1}.color-wrap{display:flex;align-items:center;gap:12px}.color-wrap input{width:54px;height:44px;padding:4px}.hint{font-size:12px;color:var(--muted);margin:4px 0 0}.timers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.timer{position:relative;overflow:hidden;min-height:220px;background:var(--card);border:1px solid var(--line);border-radius:22px;padding:22px;box-shadow:var(--shadow)}.timer:before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--accent,#e8799d)}.timer-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.timer h3{font-family:Georgia,serif;font-size:23px;font-weight:500;margin:0 0 7px;overflow-wrap:anywhere}.timer .date{font-size:12px;color:var(--muted)}.mode{display:inline-block;margin:16px 0 9px;padding:5px 10px;border-radius:99px;background:#fff0f5;color:#a34d6d;font-size:11px;letter-spacing:.3px}.digits{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:2px}.digit{background:#fff7fa;border:1px solid #fae8ee;border-radius:13px;text-align:center;padding:10px 3px}.digit strong{display:block;font-size:clamp(19px,3vw,27px);font-weight:650;color:#754457;font-variant-numeric:tabular-nums}.digit span{display:block;font-size:10px;color:var(--muted);margin-top:2px}.timer-photo{width:100%;height:112px;object-fit:cover;border-radius:13px;margin-top:13px}.actions{display:flex;gap:8px;margin-top:16px}.actions button{flex:1}.empty{text-align:center;padding:42px 18px;color:var(--muted);border:1px dashed #edcbd7;border-radius:20px;background:#fff9fb}.empty .big{font-size:35px;margin-bottom:8px}.footer{text-align:center;color:#b28c9b;font-size:12px;margin-top:28px}.toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:#704355;color:#fff;padding:11px 17px;border-radius:99px;box-shadow:var(--shadow);z-index:5;font-size:13px}
+    @media(max-width:700px){.wrap{width:min(100% - 22px,560px);padding-top:18px}.panel{padding:18px;border-radius:20px}.timers{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.full{grid-column:auto}.topbar{align-items:flex-start}.timer{padding:19px}.hero{padding-top:16px}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header class="hero"><div class="heart">♡</div><h1>Наш час</h1><p class="subtitle">Кожна секунда ближче одне до одного</p></header>
+
+    <section id="loginPanel" class="panel login">
+      <h2 class="section-title">Наш маленький простір 💗</h2>
+      <p class="hint">Увійдіть у спільний обліковий запис, щоб бачити й змінювати ваші таймери.</p>
+      <form id="loginForm">
+        <div class="field"><label for="email">Електронна пошта</label><input id="email" type="email" autocomplete="username" required placeholder="name@example.com"></div>
+        <div class="field"><label for="password">Пароль</label><input id="password" type="password" autocomplete="current-password" required placeholder="Ваш пароль"></div>
+        <button class="btn" type="submit" style="width:100%">Увійти ❤️</button>
+        <div id="loginError" class="error" role="status"></div>
+      </form>
+    </section>
+
+    <section id="appPanel" class="hidden">
+      <div class="topbar"><p>Ваші спільні спогади й очікування 💞</p><button id="logoutBtn" class="btn secondary small">Вийти</button></div>
+      <section class="panel add-panel">
+        <h2 id="formTitle" class="section-title">Додати новий таймер ✨</h2>
+        <form id="timerForm">
+          <div class="form-grid">
+            <div class="field full"><label for="timerTitle">Назва події</label><input id="timerTitle" maxlength="70" required placeholder="Наприклад: Наша перша зустріч"></div>
+            <div class="field"><label for="timerDate">Дата й час</label><input id="timerDate" type="datetime-local" required></div>
+            <div class="field"><label for="timerColor">Колір таймера</label><div class="color-wrap"><input id="timerColor" type="color" value="#e8799d"><span class="hint">Оберіть свій відтінок</span></div></div>
+            <div class="field full"><label for="timerPhoto">Посилання на фото (необов'язково)</label><input id="timerPhoto" type="url" placeholder="https://..."></div>
+          </div>
+          <p class="hint">Майбутня дата — зворотний відлік. Минуле — час, що минув від цієї події. Перемикання відбудеться автоматично.</p>
+          <div class="row" style="margin-top:15px"><button id="saveBtn" class="btn" type="submit">Зберегти таймер</button><button id="cancelEditBtn" class="btn secondary hidden" type="button">Скасувати</button></div>
+          <div id="formError" class="error" role="status"></div>
+        </form>
+      </section>
+      <div id="timers" class="timers"></div>
+      <div id="emptyState" class="empty hidden"><div class="big">♡</div><strong>Тут з'явиться ваша перша історія</strong><p>Додайте дату, яка має для вас особливе значення.</p></div>
+    </section>
+    <div class="footer">Створено з любов'ю для вас двох · Наш час ❤️</div>
+  </main>
+  <div id="toast" class="toast hidden"></div>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+    import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';
+    import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDUBh1vJcb9vd3og8wP8uirFig4Qz_-z50",
+      authDomain: "nash-chas-ed25f.firebaseapp.com",
+      projectId: "nash-chas-ed25f",
+      storageBucket: "nash-chas-ed25f.firebasestorage.app",
+      messagingSenderId: "118702039529",
+      appId: "1:118702039529:web:24c84f319f56d4bb73ab78",
+      measurementId: "G-QSSLVC041W"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const $ = (id) => document.getElementById(id);
+    let timers = [];
+    let unsubscribeTimers = null;
+    let editingId = null;
+    let tickHandle = null;
+
+    $('loginForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      $('loginError').textContent = '';
+      try {
+        await signInWithEmailAndPassword(auth, $('email').value.trim(), $('password').value);
+        $('password').value = '';
+      } catch (error) {
+        $('loginError').textContent = friendlyAuthError(error.code);
+      }
+    });
+
+    $('logoutBtn').addEventListener('click', async () => {
+      try { await signOut(auth); } catch (error) { showToast('Не вдалося вийти. Спробуйте ще раз.'); }
+    });
+
+    onAuthStateChanged(auth, (user) => {
+      $('loginPanel').classList.toggle('hidden', !!user);
+      $('appPanel').classList.toggle('hidden', !user);
+      if (unsubscribeTimers) { unsubscribeTimers(); unsubscribeTimers = null; }
+      if (tickHandle) { clearInterval(tickHandle); tickHandle = null; }
+      if (user) {
+        unsubscribeTimers = onSnapshot(collection(db, 'timers'), (snapshot) => {
+          timers = snapshot.docs.map(item => ({ id: item.id, ...item.data() }));
+          timers.sort((a,b) => Number(a.dateMs) - Number(b.dateMs));
+          renderTimers();
+        }, (error) => {
+          console.error(error);
+          showToast('Не вдалося завантажити таймери. Перевірте правила Firestore.');
+        });
+        tickHandle = setInterval(renderTimers, 1000);
+      } else {
+        timers = [];
+        renderTimers();
+        resetForm();
+      }
+    });
+
+    $('timerForm').addEventListener('submit', async (event) => {
+      event.preventDefault();
+      $('formError').textContent = '';
+      const title = $('timerTitle').value.trim();
+      const dateMs = new Date($('timerDate').value).getTime();
+      const color = $('timerColor').value;
+      const photo = $('timerPhoto').value.trim();
+      if (!title || !Number.isFinite(dateMs)) { $('formError').textContent = 'Перевірте назву та дату.'; return; }
+      const data = { title, dateMs, color, photo, updatedAt: serverTimestamp() };
+      try {
+        if (editingId) {
+          await updateDoc(doc(db, 'timers', editingId), data);
+          showToast('Таймер оновлено ❤️');
+        } else {
+          await addDoc(collection(db, 'timers'), { ...data, createdAt: serverTimestamp() });
+          showToast('Новий таймер додано 💗');
+        }
+        resetForm();
+      } catch (error) {
+        console.error(error);
+        $('formError').textContent = 'Не вдалося зберегти. Перевірте інтернет і правила Firestore.';
+      }
+    });
+
+    $('cancelEditBtn').addEventListener('click', resetForm);
+
+    function renderTimers() {
+      const container = $('timers');
+      container.innerHTML = '';
+      $('emptyState').classList.toggle('hidden', timers.length !== 0);
+      for (const timer of timers) {
+        const card = document.createElement('article');
+        card.className = 'timer';
+        card.style.setProperty('--accent', safeColor(timer.color));
+        const future = Number(timer.dateMs) > Date.now();
+        const delta = Math.abs(Number(timer.dateMs) - Date.now());
+        const totalSeconds = Math.floor(delta / 1000);
+        const days = Math.floor(totalSeconds / 86400);
+        const hours = Math.floor((totalSeconds % 86400) / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        const dateText = new Intl.DateTimeFormat('uk-UA', { dateStyle:'long', timeStyle:'short' }).format(new Date(Number(timer.dateMs)));
+        card.innerHTML = `
+          <div class="timer-head"><div><h3>${escapeHtml(timer.title || 'Без назви')}</h3><div class="date">${dateText}</div></div><span style="font-size:22px">♡</span></div>
+          <div class="mode">${future ? 'ЗАЛИШИЛОСЯ ДО ПОДІЇ' : 'МИ РАЗОМ ВЖЕ'}</div>
+          <div class="digits">
+            ${digit(days,'днів')}${digit(hours,'годин')}${digit(minutes,'хвилин')}${digit(seconds,'секунд')}
+          </div>
+          ${timer.photo ? `<img class="timer-photo" src="${escapeAttr(timer.photo)}" alt="Фото до події" loading="lazy" referrerpolicy="no-referrer">` : ''}
+          <div class="actions"><button class="btn secondary small edit-btn" type="button">Змінити</button><button class="btn danger small delete-btn" type="button">Видалити</button></div>`;
+        card.querySelector('.edit-btn').addEventListener('click', () => startEdit(timer));
+        card.querySelector('.delete-btn').addEventListener('click', () => removeTimer(timer));
+        const photo = card.querySelector('.timer-photo');
+        if (photo) photo.addEventListener('error', () => photo.remove());
+        container.appendChild(card);
+      }
+    }
+
+    function digit(value, label) { return `<div class="digit"><strong>${String(value).padStart(2,'0')}</strong><span>${label}</span></div>`; }
+    function startEdit(timer) {
+      editingId = timer.id;
+      $('formTitle').textContent = 'Змінити таймер ✨';
+      $('timerTitle').value = timer.title || '';
+      $('timerDate').value = toLocalInput(Number(timer.dateMs));
+      $('timerColor').value = safeColor(timer.color);
+      $('timerPhoto').value = timer.photo || '';
+      $('saveBtn').textContent = 'Зберегти зміни';
+      $('cancelEditBtn').classList.remove('hidden');
+      $('formTitle').scrollIntoView({ behavior:'smooth', block:'center' });
+    }
+    async function removeTimer(timer) {
+      if (!confirm(`Видалити таймер «${timer.title}»?`)) return;
+      try { await deleteDoc(doc(db, 'timers', timer.id)); showToast('Таймер видалено'); }
+      catch (error) { console.error(error); showToast('Не вдалося видалити таймер'); }
+    }
+    function resetForm() {
+      editingId = null;
+      $('timerForm').reset();
+      $('timerColor').value = '#e8799d';
+      $('formTitle').textContent = 'Додати новий таймер ✨';
+      $('saveBtn').textContent = 'Зберегти таймер';
+      $('cancelEditBtn').classList.add('hidden');
+      $('formError').textContent = '';
+    }
+    function toLocalInput(ms) {
+      const d = new Date(ms - new Date(ms).getTimezoneOffset() * 60000);
+      return d.toISOString().slice(0,16);
+    }
+    function safeColor(value) { return /^#[0-9a-f]{6}$/i.test(value || '') ? value : '#e8799d'; }
+    function escapeHtml(value) { return String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function escapeAttr(value) { return escapeHtml(value).replace(/`/g, '&#96;'); }
+    function friendlyAuthError(code) {
+      if (code === 'auth/invalid-credential' || code === 'auth/wrong-password' || code === 'auth/user-not-found') return 'Неправильна пошта або пароль.';
+      if (code === 'auth/too-many-requests') return 'Забагато спроб. Спробуйте пізніше.';
+      if (code === 'auth/network-request-failed') return 'Немає з’єднання з інтернетом.';
+      return 'Не вдалося увійти. Перевірте дані й спробуйте ще раз.';
+    }
+    let toastTimeout;
+    function showToast(message) {
+      const toast = $('toast'); toast.textContent = message; toast.classList.remove('hidden');
+      clearTimeout(toastTimeout); toastTimeout = setTimeout(() => toast.classList.add('hidden'), 2600);
+    }
+  </script>
+</body>
+</html>
