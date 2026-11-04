@@ -164,14 +164,6 @@
         const card = document.createElement('article');
         card.className = 'timer';
         card.style.setProperty('--accent', safeColor(timer.color));
-        if (timer.photo) {
-          card.classList.add('has-photo');
-          const photoBackground = document.createElement('div');
-          photoBackground.className = 'timer-photo-bg';
-          photoBackground.setAttribute('aria-hidden', 'true');
-          photoBackground.style.backgroundImage = `linear-gradient(rgba(255,247,250,.56), rgba(255,247,250,.70)), url(${JSON.stringify(timer.photo)})`;
-          card.appendChild(photoBackground);
-        }
         const future = Number(timer.dateMs) > Date.now();
         const delta = Math.abs(Number(timer.dateMs) - Date.now());
         const totalSeconds = Math.floor(delta / 1000);
@@ -187,6 +179,14 @@
             ${digit(days,'днів')}${digit(hours,'годин')}${digit(minutes,'хвилин')}${digit(seconds,'секунд')}
           </div>
           <div class="actions"><button class="btn secondary small edit-btn" type="button">Змінити</button><button class="btn danger small delete-btn" type="button">Видалити</button></div>`;
+        if (timer.photo) {
+          card.classList.add('has-photo');
+          const photoBackground = document.createElement('div');
+          photoBackground.className = 'timer-photo-bg';
+          photoBackground.setAttribute('aria-hidden', 'true');
+          photoBackground.style.backgroundImage = `linear-gradient(rgba(255,247,250,.48), rgba(255,247,250,.62)), url("${String(timer.photo).replace(/\\/g, '\\\\').replace(/"/g, '\\"')}")`;
+          card.prepend(photoBackground);
+        }
         card.querySelector('.edit-btn').addEventListener('click', () => startEdit(timer));
         card.querySelector('.delete-btn').addEventListener('click', () => removeTimer(timer));
         container.appendChild(card);
