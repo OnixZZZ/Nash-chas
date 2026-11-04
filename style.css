@@ -1,0 +1,132 @@
+/* Наш час — стиль «щоденник / альбом». Лише оформлення, логіка не змінена. */
+:root{
+  --desk:#cdb594;--paper:#fbf4e2;--paper2:#f4e9cf;--card:#fffdf6;
+  --ink:#4a3a33;--muted:#8a7565;--line:#e3d4b4;
+  --rose:#b24f69;--rose2:#f2d9de;--tape:#e9c5cdd9;--leather:#7a4a3c;
+  --note:#fff0a8;--shadow:0 6px 18px #5a3a2a2e,0 1px 3px #5a3a2a33;
+  --hand:'Caveat','Marck Script',cursive;--script:'Marck Script','Caveat',cursive;--serif:'Lora',Georgia,serif;
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .25 0 0 0 0 .15 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font-family:var(--serif);line-height:1.5;background:var(--noise),var(--desk);background-attachment:fixed}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+:focus-visible{outline:3px solid #b24f6966;outline-offset:2px}
+
+/* Сторінка альбому */
+.shell{max-width:1120px;margin:20px auto;padding:30px 30px 56px;background:var(--noise),var(--paper);border-left:16px solid var(--leather);border-radius:4px 16px 16px 4px;box-shadow:0 18px 40px #3a22184d}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px;padding-bottom:14px;border-bottom:2px dashed var(--line)}
+.brandmark{font-family:var(--script);font-size:38px;color:var(--rose);line-height:1.1}
+.brand small{display:block;color:var(--muted);font:italic 12px var(--serif);margin-top:3px}
+.userline{font:20px var(--hand);color:var(--muted)}
+.muted{color:var(--muted)}.tiny{font-size:13px}.hidden{display:none!important}
+
+/* Папір і поля */
+.panel{position:relative;background:var(--card);border:1px solid var(--line);border-radius:4px;padding:22px;box-shadow:var(--shadow)}
+.login{max-width:420px;margin:7vh auto}
+.login::before,.timer::before,.moment::before{content:'';position:absolute;top:-12px;left:50%;width:92px;height:26px;background:var(--tape);transform:translateX(-50%) rotate(-3deg);box-shadow:0 1px 2px #0002}
+.login h1{font:400 34px var(--script);color:var(--rose);margin:0 0 8px}
+.field{display:grid;gap:5px;margin:13px 0}
+.field label{font:20px var(--hand);color:var(--muted)}
+input,textarea,select{width:100%;border:0;border-bottom:2px solid var(--line);border-radius:4px 4px 0 0;padding:11px 10px;background:#fffbee;color:var(--ink);outline:none}
+textarea{min-height:110px;resize:vertical}
+input:focus,textarea:focus,select:focus{border-bottom-color:var(--rose);background:#fff}
+input[type=file]{padding:8px 4px;background:none;border-bottom-style:dashed}
+input[type=color]{height:44px;padding:4px}
+
+/* Кнопки */
+.btn{border:2px solid var(--rose);border-radius:4px 12px 5px 12px;padding:6px 18px;background:var(--rose);color:#fff;font:700 21px var(--hand);box-shadow:2px 3px 0 #7a2f4455;transition:transform .15s}
+.btn:hover{transform:rotate(-1deg) translateY(-1px)}
+.btn.light{background:transparent;color:var(--rose);border-style:dashed;box-shadow:none}
+.btn.danger{background:#fff1ee;color:#a04545;border-color:#e2b3ac;border-style:dashed;box-shadow:none}
+.btn.small{padding:3px 13px;font-size:18px}
+.btn:disabled{opacity:.5}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.topline .muted{font:22px var(--hand)}
+
+/* Закладки */
+.nav{display:flex;gap:6px;overflow:auto;padding:6px 2px 0;margin-bottom:26px;border-bottom:3px solid var(--leather);scrollbar-width:none}
+.nav button{white-space:nowrap;border:1px solid var(--line);border-bottom:0;background:var(--paper2);border-radius:10px 10px 0 0;padding:5px 16px 3px;color:var(--muted);font:700 22px var(--hand)}
+.nav button.active{background:var(--rose);color:#fff;border-color:var(--rose);padding-top:9px}
+.view{display:none}.view.active{display:block}
+
+/* Титульний розворот */
+.welcome{display:grid;grid-template-columns:1.25fr .75fr;gap:26px;margin-bottom:24px}
+.cover{position:relative;overflow:hidden;min-height:240px;padding:28px;display:flex;flex-direction:column;justify-content:end;background:var(--noise),var(--paper2);border:2px solid #d3bf98;outline:1px solid #d3bf98;outline-offset:-10px;border-radius:4px;box-shadow:var(--shadow)}
+.cover:after{content:'♡';position:absolute;right:18px;top:-8px;font:170px var(--script);color:#b24f6924}
+.cover h1{position:relative;z-index:1;font:400 clamp(34px,5.4vw,56px)/1.1 var(--script);margin:0 0 8px;color:var(--rose)}
+.cover p{position:relative;z-index:1;margin:0;font:italic 15px var(--serif);color:var(--muted)}
+.together{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border:3px double #c98b98;background:#fffaf0;transform:rotate(1.4deg)}
+.together .number{font:700 clamp(54px,8vw,84px)/1 var(--hand);color:var(--rose);padding:0 8px;background:linear-gradient(transparent 62%,var(--rose2) 62%);font-variant-numeric:tabular-nums}
+
+/* Лічильники */
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:20px}
+.stat{padding:12px 16px;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--rose);border-radius:3px;box-shadow:var(--shadow)}
+.stat strong{display:block;font:700 42px/1 var(--hand);color:var(--rose)}
+.stat span{font:italic 13px var(--serif);color:var(--muted)}
+
+/* Заголовки розділів */
+.sectionhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:30px 0 16px}
+.sectionhead h2{font:700 36px/1.1 var(--hand);margin:0;color:var(--ink);padding:0 6px;background:linear-gradient(transparent 60%,var(--rose2) 60%)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:34px 28px;padding-top:8px}
+.date{font:italic 13px var(--serif);color:var(--muted);margin-bottom:8px}
+.desc{font-size:14px;line-height:1.65;white-space:pre-wrap;color:#65524a}
+.itemactions{display:flex;gap:8px;margin-top:14px}.itemactions button{flex:1}
+.moment h3,.itembody h3,.letter h3,.dream h3,.timer h3{font:700 28px/1.15 var(--hand);margin:0 0 4px;color:var(--ink)}
+
+/* Спогади — полароїди */
+.moment{position:relative;background:#fff;padding:12px 12px 6px;border-radius:2px;box-shadow:var(--shadow);transition:transform .2s}
+.moment:nth-child(odd){transform:rotate(-1.3deg)}.moment:nth-child(even){transform:rotate(1.1deg)}
+.moment:hover{transform:rotate(0) translateY(-3px)}
+.moment img{width:100%;height:210px;object-fit:cover;display:block;background:var(--paper2);filter:sepia(.18) saturate(.95)}
+.momentbody,.itembody{padding:14px 6px 10px}
+
+/* Таймери — квитки зі штампами */
+.timer{position:relative;padding:20px 18px 16px;background:#fffaf0;border:2px dashed #cfa0aa;border-radius:6px;box-shadow:var(--shadow)}
+.timer:nth-child(even){transform:rotate(.8deg)}.timer:nth-child(odd){transform:rotate(-.8deg)}
+.timer .mode{font:italic 12px var(--serif)}
+.timer .digits{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:14px 0}
+.digit{border:2px solid var(--rose);border-radius:6px;padding:6px 2px 4px;text-align:center;color:var(--rose);transform:rotate(-2deg)}
+.digit:nth-child(even){transform:rotate(1.5deg)}
+.digit strong{display:block;font:700 34px/1 var(--hand)}
+.digit span{font:italic 11px var(--serif);color:var(--muted)}
+
+/* Листи — лінований аркуш */
+.letter{position:relative;padding:20px 20px 16px 38px;background:#fffdf5;border:1px solid var(--line);border-radius:3px;box-shadow:var(--shadow)}
+.letter::before{content:'';position:absolute;left:24px;top:0;bottom:0;width:2px;background:#e8a9b3}
+.letter .lettertext{margin-top:10px;font:20px/32px var(--script);white-space:pre-wrap;background:repeating-linear-gradient(to bottom,transparent 0 31px,#e3d5b8 31px 32px)}
+
+/* Мрії — стікери */
+.dream{display:flex;gap:12px;align-items:flex-start;padding:18px 16px;background:var(--note);border-radius:2px 2px 14px 2px;box-shadow:var(--shadow)}
+.dream:nth-child(odd){transform:rotate(-1.2deg)}.dream:nth-child(even){transform:rotate(1deg);background:#ffd9df}
+.dream.done{opacity:.7}.dream.done h3{text-decoration:line-through;text-decoration-color:var(--rose)}
+.check{width:24px;height:24px;accent-color:var(--rose);flex:none;margin-top:4px}
+
+/* Галерея */
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.gallery img{width:100%;aspect-ratio:1;object-fit:cover;background-clip:content-box;padding:9px 9px 26px;background-color:#fff;border-radius:2px;box-shadow:var(--shadow);cursor:pointer;transition:transform .2s}
+.gallery img:nth-child(3n+1){transform:rotate(-2deg)}.gallery img:nth-child(3n+2){transform:rotate(1.5deg)}.gallery img:nth-child(3n){transform:rotate(-.8deg)}
+.gallery img:hover{transform:rotate(0) scale(1.03)}
+
+/* Порожні місця */
+.empty{border:2px dashed #d8c39a;border-radius:6px;text-align:center;padding:34px 20px;color:var(--muted);background:#fffaf0;font:italic 15px var(--serif)}
+.empty b{display:block;font:700 44px/1 var(--hand);color:var(--rose);margin-bottom:6px}
+
+/* Форма, вікно, повідомлення */
+.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}.full{grid-column:1/-1}
+.error{color:#b34d4d;font-size:13px;min-height:16px}
+.modalback{position:fixed;inset:0;background:#2e1c1460;display:grid;place-items:center;padding:16px;z-index:10}
+.modal{width:min(560px,100%);max-height:90vh;overflow:auto;background:var(--noise),var(--paper);border:1px solid var(--line);border-radius:3px 3px 14px 3px;padding:24px;box-shadow:0 20px 50px #2e1c1480}
+.modalhead{display:flex;justify-content:space-between;align-items:center}
+.modalhead h2{font:400 32px var(--script);color:var(--rose);margin:0}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#4a3029;color:#fff;border-radius:4px 14px 4px 14px;padding:8px 20px;font:22px var(--hand);z-index:20;box-shadow:var(--shadow)}
+.footer{text-align:center;color:var(--muted);font:22px var(--hand);margin-top:36px}
+
+@media(max-width:720px){
+  .shell{margin:0;padding:18px 14px 40px;border-left-width:8px;border-radius:0;min-height:100vh}
+  .brandmark{font-size:31px}.welcome{grid-template-columns:1fr;gap:22px}.cover{min-height:200px}
+  .together{min-height:160px}.stats{gap:8px}.stat{padding:10px}.stat strong{font-size:34px}
+  .grid,.formgrid{grid-template-columns:1fr}.full{grid-column:auto}.gallery{grid-template-columns:repeat(2,1fr);gap:14px}
+  .gallery img:nth-child(3n+1),.gallery img:nth-child(3n+2),.gallery img:nth-child(3n){transform:none}
+  .sectionhead h2{font-size:30px}.panel{padding:17px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
