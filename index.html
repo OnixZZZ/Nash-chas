@@ -36,7 +36,9 @@
             <div class="field full"><label for="timerTitle">Назва події</label><input id="timerTitle" maxlength="70" required placeholder="Наприклад: Наша перша зустріч"></div>
             <div class="field"><label for="timerDate">Дата й час</label><input id="timerDate" type="datetime-local" required></div>
             <div class="field"><label for="timerColor">Колір таймера</label><div class="color-wrap"><input id="timerColor" type="color" value="#e8799d"><span class="hint">Оберіть свій відтінок</span></div></div>
-            <div class="field full"><label for="timerPhoto">Посилання на фото (необов'язково)</label><input id="timerPhoto" type="url" placeholder="https://..."></div>
+            <div class="field full"><label for="timerPhotoFile">1. Завантажити фото з iPhone або програми «Файли»</label><input id="timerPhotoFile" type="file" accept="image/*"><p class="hint">Можна вибрати фото з галереї або відкрити «Огляд» і вибрати Google Drive, якщо він підключений у програмі «Файли».</p><div id="photoStatus" class="hint" aria-live="polite"></div></div>
+            <div class="field full"><label for="timerDriveUrl">2. Посилання на фото з Google Drive</label><input id="timerDriveUrl" type="url" placeholder="https://drive.google.com/file/d/.../view"><p class="hint">У Google Drive відкрий доступ до фото за посиланням («Усі, хто має посилання»), скопіюй посилання та встав сюди.</p></div>
+            <div class="field full"><label for="timerPhotoUrl">3. Пряме посилання на фото з іншого сайту</label><input id="timerPhotoUrl" type="url" placeholder="https://example.com/photo.jpg"></div>
           </div>
           <p class="hint">Майбутня дата — зворотний відлік. Минуле — час, що минув від цієї події. Перемикання відбудеться автоматично.</p>
           <div class="row" style="margin-top:15px"><button id="saveBtn" class="btn" type="submit">Зберегти таймер</button><button id="cancelEditBtn" class="btn secondary hidden" type="button">Скасувати</button></div>
@@ -73,6 +75,23 @@
     let unsubscribeTimers = null;
     let editingId = null;
     let tickHandle = null;
+    let selectedPhotoData = '';
+    let existingPhoto = '';
+
+    $('timerPhotoFile').addEventListener('change', async () => {
+      const file = $('timerPhotoFile').files?.[0];
+      $('photoStatus').textContent = '';
+      selectedPhotoData = '';
+      if (!file) return;
+      if (!file.type.startsWith('image/')) { $('photoStatus').textContent = 'Будь ласка, вибери файл зображення.'; return; }
+      try {
+        selectedPhotoData = await compressImage(file);
+        $('photoStatus').textContent = 'Фото готове до збереження ❤️';
+      } catch (error) {
+        console.error(error);
+        $('photoStatus').textContent = 'Не вдалося прочитати фото. Спробуй JPG або PNG.';
+      }
+    });
 
     $('loginForm').addEventListener('submit', async (event) => {
       event.preventDefault();
@@ -117,7 +136,7 @@
       const title = $('timerTitle').value.trim();
       const dateMs = new Date($('timerDate').value).getTime();
       const color = $('timerColor').value;
-      const photo = $('timerPhoto').value.trim();
+      const photo = selectedPhotoData || existingPhoto || driveImageUrl($('timerDriveUrl').value.trim()) || $('timerPhotoUrl').value.trim();
       if (!title || !Number.isFinite(dateMs)) { $('formError').textContent = 'Перевірте назву та дату.'; return; }
       const data = { title, dateMs, color, photo, updatedAt: serverTimestamp() };
       try {
@@ -169,6 +188,51 @@
       }
     }
 
+    function compressImage(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error('Не вдалося прочитати файл'));
+        reader.onload = () => {
+          const img = new Image();
+          img.onerror = () => reject(new Error('Формат фото не підтримується браузером'));
+          img.onload = () => {
+            const maxSide = 1200;
+            const scale = Math.min(1, maxSide / Math.max(img.width, img.height));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(img.width * scale));
+            canvas.height = Math.max(1, Math.round(img.height * scale));
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            let quality = 0.78;
+            let data = canvas.toDataURL('image/jpeg', quality);
+            while (data.length > 850000 && quality > 0.38) {
+              quality -= 0.08;
+              data = canvas.toDataURL('image/jpeg', quality);
+            }
+            if (data.length > 950000) { reject(new Error('Фото завелике. Вибери менше зображення.')); return; }
+            resolve(data);
+          };
+          img.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function isDriveUrl(value) { return /drive\.google\.com\/(file\/d\/|open\?id=|uc\?)/i.test(value || ''); }
+    function driveImageUrl(value) {
+      if (!value) return '';
+      try {
+        const url = new URL(value);
+        if (!/drive\.google\.com$/i.test(url.hostname)) return value;
+        let id = '';
+        const match = url.pathname.match(/\/file\/d\/([^/]+)/);
+        if (match) id = match[1];
+        if (!id) id = url.searchParams.get('id') || '';
+        if (!id) return value;
+        return `https://drive.google.com/uc?export=view&id=${encodeURIComponent(id)}`;
+      } catch { return value; }
+    }
+
     function digit(value, label) { return `<div class="digit"><strong>${String(value).padStart(2,'0')}</strong><span>${label}</span></div>`; }
     function startEdit(timer) {
       editingId = timer.id;
@@ -176,7 +240,12 @@
       $('timerTitle').value = timer.title || '';
       $('timerDate').value = toLocalInput(Number(timer.dateMs));
       $('timerColor').value = safeColor(timer.color);
-      $('timerPhoto').value = timer.photo || '';
+      $('timerPhotoUrl').value = (timer.photo && !timer.photo.startsWith('data:') && !isDriveUrl(timer.photo)) ? timer.photo : '';
+      $('timerDriveUrl').value = (timer.photo && isDriveUrl(timer.photo)) ? timer.photo : '';
+      existingPhoto = timer.photo || '';
+      $('photoStatus').textContent = existingPhoto.startsWith('data:') ? 'До цього таймера вже додано фото.' : '';
+      selectedPhotoData = '';
+      $('timerPhotoFile').value = '';
       $('saveBtn').textContent = 'Зберегти зміни';
       $('cancelEditBtn').classList.remove('hidden');
       $('formTitle').scrollIntoView({ behavior:'smooth', block:'center' });
@@ -190,6 +259,12 @@
       editingId = null;
       $('timerForm').reset();
       $('timerColor').value = '#e8799d';
+      $('timerPhotoFile').value = '';
+      $('timerPhotoUrl').value = '';
+      $('timerDriveUrl').value = '';
+      $('photoStatus').textContent = '';
+      selectedPhotoData = '';
+      existingPhoto = '';
       $('formTitle').textContent = 'Додати новий таймер ✨';
       $('saveBtn').textContent = 'Зберегти таймер';
       $('cancelEditBtn').classList.add('hidden');
