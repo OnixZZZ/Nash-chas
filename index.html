@@ -4,7 +4,95 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#faf6f2"><title>Наш час ❤️</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<style>
+/* Наш час — «Романтичний журнал». Лише оформлення. */
+:root{--bg:#faf6f2;--ink:#2b2226;--muted:#8b7a80;--wine:#a83a5a;--rose:#f7e3e8;--gold:#c9a46c;--line:#ecdfd9;
+--shadow:0 12px 32px #6b2f4524;--serif:'Playfair Display',Georgia,serif;--sans:'Manrope',system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;color:var(--ink);font:16px/1.65 var(--sans);background:var(--bg);min-height:100vh}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+:focus-visible{outline:2px solid var(--wine);outline-offset:2px}
+.hidden{display:none!important}.muted{color:var(--muted)}.tiny{font-size:13px}
+.shell{max-width:980px;margin:auto;padding:24px 20px 70px}
+.brand{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px}
+.brandmark{font:italic 700 36px/1.1 var(--serif);color:var(--wine)}
+.brand small{display:block;color:var(--muted);font-size:13px;margin-top:4px}
+.userline{font-size:13px;color:var(--muted)}
+.topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:6px 0 4px}
+
+.nav{position:sticky;top:0;z-index:5;display:flex;gap:26px;overflow:auto;padding:0 2px;margin-bottom:26px;background:#faf6f2ee;backdrop-filter:blur(10px);border-bottom:1px solid var(--line);scrollbar-width:none}
+.nav button{white-space:nowrap;background:none;border:0;border-bottom:2px solid transparent;padding:13px 2px;color:var(--muted);font-weight:700;font-size:15px}
+.nav button.active{color:var(--wine);border-bottom-color:var(--wine)}
+.view{display:none}.view.active{display:block}
+
+.panel{background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:var(--shadow)}
+.login{max-width:420px;margin:8vh auto}.login h1{font:italic 700 30px/1.2 var(--serif);color:var(--wine);margin:0 0 8px}
+.field{display:grid;gap:6px;margin:14px 0}.field label{font-size:13px;font-weight:700;color:var(--muted)}
+input,textarea,select{width:100%;border:1.5px solid var(--line);border-radius:14px;padding:12px 14px;background:#fff;color:var(--ink);outline:none}
+textarea{min-height:100px;resize:vertical}input:focus,textarea:focus,select:focus{border-color:var(--wine)}
+input[type=file]{border-style:dashed}
+.btn{border:0;border-radius:99px;padding:10px 22px;font-weight:700;color:#fff;background:var(--wine);transition:transform .15s}
+.btn:hover{transform:translateY(-1px)}
+.btn.light{background:transparent;color:var(--wine);border:1.5px solid #e3c3cc}
+.btn.danger{background:transparent;color:#9a4a50;border:1.5px solid #ecd2d2}
+.btn.small{padding:6px 15px;font-size:13px}
+
+/* Огляд */
+.hero{text-align:center;padding:46px 20px 38px;border-radius:30px;border:1px solid var(--line);background:linear-gradient(180deg,#fff,var(--rose));box-shadow:var(--shadow)}
+.hero h1{margin:0 0 22px;font:italic 500 clamp(32px,5.5vw,52px)/1.1 var(--serif)}
+.together .number{font:700 clamp(64px,13vw,120px)/1 var(--serif);color:var(--wine);font-variant-numeric:tabular-nums}
+.together .tiny{margin-top:2px}
+.stats{display:flex;justify-content:center;gap:clamp(20px,6vw,56px);margin:26px 0 4px;text-align:center}
+.stat strong{display:block;font:700 34px/1.1 var(--serif);color:var(--gold)}.stat span{font-size:13px;color:var(--muted)}
+.sectionhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:34px 0 16px}
+.sectionhead h2{margin:0;font:italic 700 30px/1.15 var(--serif)}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}
+.list{display:grid;gap:14px}
+.date{font-size:13px;color:var(--muted);margin-bottom:4px}
+.desc{font-size:15px;line-height:1.7;white-space:pre-wrap;color:#5b4b52;margin-top:6px}
+h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
+.itemactions{display:flex;gap:8px;margin-top:14px}.itemactions button{flex:1}
+.count{display:inline-block;margin:4px 0 2px;padding:2px 14px;font-size:13px;font-weight:700;color:var(--wine);background:var(--rose);border-radius:99px;font-variant-numeric:tabular-nums}
+.count:empty{display:none}
+
+/* Спогади: фото на першому місці */
+.mem{background:#fff;border-radius:24px;overflow:hidden;box-shadow:var(--shadow)}
+.mem img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;cursor:zoom-in}
+.ph{aspect-ratio:16/7;display:grid;place-items:center;font:80px var(--serif);color:#d98fa5;background:linear-gradient(135deg,#f8e1e7,#f5ead9)}
+.mem .body{padding:18px 22px 18px}
+
+/* Мрії та ідеї: легкі пунктирні картки */
+.wish{display:flex;gap:14px;align-items:flex-start;padding:18px 20px;background:#ffffffb8;border:1.5px dashed #dcbfc6;border-radius:22px}
+.wish.done{opacity:.6}.wish.done h3{text-decoration:line-through;text-decoration-color:var(--wine)}
+.wbody{flex:1;min-width:0}
+.check{width:22px;height:22px;accent-color:var(--wine);flex:none;margin-top:4px}
+.wimg{width:100%;max-height:230px;object-fit:cover;border-radius:16px;margin-top:10px;cursor:zoom-in;display:block}
+
+.letter{background:#fffdf9;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:8px 20px 20px 8px;padding:22px 24px;box-shadow:var(--shadow)}
+.letter .lettertext{margin-top:8px;font:italic 500 19px/1.7 var(--serif);white-space:pre-wrap}
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.gallery img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:20px;cursor:zoom-in;box-shadow:var(--shadow);transition:transform .2s}
+.gallery img:hover{transform:scale(1.03)}
+.empty{grid-column:1/-1;text-align:center;padding:38px 20px;color:var(--muted);border:1.5px dashed #e3c9d0;border-radius:22px;background:#ffffff80}
+.empty b{display:block;font:700 44px/1 var(--serif);color:#d98fa5;margin-bottom:6px}
+
+.pv img{width:100%;max-height:220px;object-fit:cover;border-radius:14px}
+.error{color:#b04a55;font-size:13px;min-height:16px}
+.modalback{position:fixed;inset:0;background:#2b222699;display:grid;place-items:center;padding:14px;z-index:20}
+.modal{width:min(560px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:26px;padding:26px;box-shadow:0 24px 60px #0004}
+.modalhead{display:flex;justify-content:space-between;align-items:center}
+.modalhead h2{margin:0;font:italic 700 28px var(--serif);color:var(--wine)}
+#lbImg{max-width:100%;max-height:92vh;border-radius:14px;cursor:zoom-out}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:30;padding:10px 22px;font-size:14px;font-weight:700;color:#fff;background:var(--ink);border-radius:99px;box-shadow:var(--shadow)}
+.footer{text-align:center;color:var(--muted);font:italic 16px var(--serif);margin-top:46px}
+@media(max-width:720px){
+ .shell{padding:16px 14px 50px}.brandmark{font-size:30px}.grid{grid-template-columns:1fr;gap:18px}
+ .hero{padding:34px 14px 28px}.gallery{grid-template-columns:repeat(2,1fr)}.sectionhead h2{font-size:26px}
+ .modalback{place-items:end center;padding:0}.modal{border-radius:26px 26px 0 0}#lightbox{place-items:center;padding:10px}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+
+</style>
 </head><body><main class="shell">
 <header class="brand"><div><div class="brandmark">Наш час ♡</div><small>спогади, які вже були, і мрії, до яких ми йдемо</small></div><div id="userLine" class="userline"></div></header>
 <section id="loginPanel" class="panel login"><h1>Наш маленький простір ♡</h1><p class="muted tiny">Увійдіть, щоб зберігати вашу спільну історію.</p><form id="loginForm"><div class="field"><label>Електронна пошта</label><input id="email" type="email" autocomplete="username" required></div><div class="field"><label>Пароль</label><input id="password" type="password" autocomplete="current-password" required></div><button class="btn" style="width:100%">Увійти ❤️</button><p id="loginError" class="error"></p></form></section>
