@@ -1,93 +1,84 @@
 <!doctype html>
 <html lang="uk">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#fff7f2"><title>Наш час ❤️</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#faf6f2"><title>Наш час ❤️</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css">
 </head><body><main class="shell">
-<header class="brand"><div><div class="brandmark">Наш час ♡</div><small>спогади, які ми зберігаємо, і плани, до яких рахуємо дні</small></div><div id="userLine" class="userline"></div></header>
+<header class="brand"><div><div class="brandmark">Наш час ♡</div><small>спогади, які вже були, і мрії, до яких ми йдемо</small></div><div id="userLine" class="userline"></div></header>
 <section id="loginPanel" class="panel login"><h1>Наш маленький простір ♡</h1><p class="muted tiny">Увійдіть, щоб зберігати вашу спільну історію.</p><form id="loginForm"><div class="field"><label>Електронна пошта</label><input id="email" type="email" autocomplete="username" required></div><div class="field"><label>Пароль</label><input id="password" type="password" autocomplete="current-password" required></div><button class="btn" style="width:100%">Увійти ❤️</button><p id="loginError" class="error"></p></form></section>
-<section id="appPanel" class="hidden"><div class="topline"><div class="muted">Ваш простір для двох 💗</div><button id="logoutBtn" class="btn light small">Вийти</button></div>
-<nav class="nav" id="nav"><button class="active" data-view="dashboard">Огляд</button><button data-view="moments">Спогади</button><button data-view="plans">Плани</button><button data-view="letters">Листи</button><button data-view="gallery">Галерея</button></nav>
-<section class="view active" id="view-dashboard"><div class="welcome"><div class="cover"><h1>Кожна мить — наша.</h1><p>Те, що вже було, і те, що ми ще збираємось пережити.</p></div><div class="panel together"><div class="muted tiny">МИ РАЗОМ ВЖЕ</div><div id="togetherCount" class="number">—</div><div class="muted tiny">днів нашої історії</div><div id="togetherHint" class="tiny muted" style="margin-top:8px">Додайте дату початку в таймерах</div></div></div>
-<div class="stats"><div class="stat"><strong id="momentsCount">0</strong><span>спогадів</span></div><div class="stat"><strong id="plansCount">0</strong><span>планів</span></div><div class="stat"><strong id="lettersCount">0</strong><span>листів</span></div></div>
-<div class="sectionhead"><h2>Найближче</h2><button class="btn light small" data-go="plans">Усі плани</button></div><div id="upcoming" class="grid"></div>
+<section id="appPanel" class="hidden"><div class="topline"><div class="muted tiny">Ваш простір для двох 💗</div><button id="logoutBtn" class="btn light small">Вийти</button></div>
+<nav class="nav" id="nav"><button class="active" data-view="dashboard">Огляд</button><button data-view="moments">Спогади</button><button data-view="dreams">Мрії та ідеї</button><button data-view="letters">Листи</button><button data-view="gallery">Галерея</button></nav>
+<section class="view active" id="view-dashboard"><div class="hero"><h1>Кожна мить — наша.</h1><div class="together"><div class="muted tiny">ми разом вже</div><div id="togetherCount" class="number">—</div><div class="muted tiny">днів нашої історії</div><div id="togetherHint" class="tiny muted"></div></div></div>
+<div class="stats"><div class="stat"><strong id="momentsCount">0</strong><span>спогадів</span></div><div class="stat"><strong id="plansCount">0</strong><span>мрій та ідей</span></div><div class="stat"><strong id="lettersCount">0</strong><span>листів</span></div></div>
+<div class="sectionhead"><h2>Найближче</h2><button class="btn light small" data-go="dreams">Усі мрії</button></div><div id="upcoming" class="list"></div>
 <div class="sectionhead"><h2>Останні спогади</h2><button class="btn light small" data-go="moments">Усі спогади</button></div><div id="recentMoments" class="grid"></div></section>
-<section class="view" id="view-moments"><div class="sectionhead"><h2>Наші спогади</h2><button class="btn small" data-add="moment">+ Новий спогад</button></div><div id="momentsList" class="grid"></div></section>
-<section class="view" id="view-plans"><div class="sectionhead"><h2>Плани й таймери</h2><button class="btn small" data-add="timer">+ Додати</button></div><div id="plansList" class="grid"></div><div class="sectionhead"><h2>Ідеї та мрії</h2><button class="btn small" data-add="dream">+ Додати ідею</button></div><div id="dreamsList" class="grid"></div></section>
+<section class="view" id="view-moments"><div class="sectionhead"><h2>Наші спогади</h2><button class="btn small" data-add="memory">+ Новий спогад</button></div><div id="momentsList" class="grid"></div></section>
+<section class="view" id="view-dreams"><div class="sectionhead"><h2>Мрії та ідеї</h2><button class="btn small" data-add="dream">+ Нова мрія</button></div><p class="muted tiny" style="margin-top:-6px">Сюди потрапляє все, що ще попереду: з майбутньою датою (з таймером) або без неї. Коли дата мине, запис сам стане спогадом.</p><div id="dreamsList" class="list"></div></section>
 <section class="view" id="view-letters"><div class="sectionhead"><h2>Наші листи</h2><button class="btn small" data-add="letter">+ Написати лист</button></div><div id="lettersList" class="grid"></div></section>
-<section class="view" id="view-gallery"><div class="sectionhead"><h2>Наша галерея</h2><button class="btn small" data-go="moments">Додати фото через спогад</button></div><div id="galleryList" class="gallery"></div><p id="galleryEmpty" class="muted tiny"></p></section>
+<section class="view" id="view-gallery"><div class="sectionhead"><h2>Наша галерея</h2><button class="btn small" data-add="memory">+ Додати фото</button></div><div id="galleryList" class="gallery"></div><p id="galleryEmpty" class="muted tiny"></p></section>
 </section><div class="footer">Створено з любов'ю для вас двох · Наш час ♡</div></main><div id="toast" class="toast hidden"></div>
 <div id="modalBack" class="modalback hidden"><div class="modal"><div class="modalhead"><h2 id="modalTitle">Новий спогад</h2><button id="closeModal" class="btn light small">Закрити</button></div><form id="itemForm"><div id="modalFields"></div><p id="modalError" class="error"></p><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" type="submit">Зберегти</button><button id="cancelModal" class="btn light" type="button">Скасувати</button></div></form></div></div>
+<div id="lightbox" class="modalback hidden"><img id="lbImg" alt=""></div>
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';import{getFirestore,collection,addDoc,doc,updateDoc,deleteDoc,onSnapshot,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 const firebaseConfig={apiKey:'AIzaSyDUBh1vJcb9vd3og8wP8uirFig4Qz_-z50',authDomain:'nash-chas-ed25f.firebaseapp.com',projectId:'nash-chas-ed25f',storageBucket:'nash-chas-ed25f.firebasestorage.app',messagingSenderId:'118702039529',appId:'1:118702039529:web:24c84f319f56d4bb73ab78'};
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id);
-const COL={moment:'moments',timer:'timers',letter:'letters',dream:'dreams'};
-let data={timers:[],moments:[],letters:[],dreams:[]},unsubs=[],edit={type:null,id:null},photoData='';
-const now=()=>Date.now(),dm=m=>Number(m.dateMs)||0,dreamMs=d=>d.date?new Date(d.date).getTime():NaN;
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id),now=()=>Date.now();
+let data={moments:[],timers:[],dreams:[],letters:[]},unsubs=[],edit=null,photoData='';
+/* Дата запису: dateMs (спогади, таймери) або date (старі мрії). 0 = без дати */
+const getMs=i=>'dateMs'in i?(Number(i.dateMs)||0):(i.date?(new Date(i.date).getTime()||0):0);
 
 $('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';try{await signInWithEmailAndPassword(auth,$('email').value.trim(),$('password').value);$('password').value=''}catch(err){$('loginError').textContent=err.code==='auth/invalid-credential'?'Неправильна пошта або пароль.':'Не вдалося увійти. Перевірте дані та інтернет.'}};
 $('logoutBtn').onclick=()=>signOut(auth);
 onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').classList.toggle('hidden',!!user);$('appPanel').classList.toggle('hidden',!user);$('userLine').textContent=user?'Ви увійшли разом ♡':'';if(user){for(const key of Object.keys(data)){unsubs.push(onSnapshot(collection(db,key),snap=>{data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));renderAll()},err=>{console.error(err);toast('Не вдалося завантажити '+key+'. Перевіримо правила доступу.')}))}}else{for(const k in data)data[k]=[];renderAll()}});
 
 $('nav').onclick=e=>{const b=e.target.closest('button[data-view]');if(b)showView(b.dataset.view)};
-document.body.addEventListener('click',e=>{const a=e.target.closest('[data-add]');if(a){const t=a.dataset.add;t==='plan'?openModal('moment',null,true):openModal(t)}const g=e.target.closest('[data-go]');if(g)showView(g.dataset.go)});
+document.body.addEventListener('click',e=>{const a=e.target.closest('[data-add]');if(a){const t=a.dataset.add;t==='letter'?openModal('letter'):openModal('item',null,'moments',t==='memory')}const g=e.target.closest('[data-go]');if(g)showView(g.dataset.go)});
 function showView(name){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));window.scrollTo({top:0,behavior:'smooth'})}
-$('closeModal').onclick=$('cancelModal').onclick=closeModal;
-function closeModal(){$('modalBack').classList.add('hidden');$('itemForm').reset();edit={type:null,id:null};photoData=''}
+$('closeModal').onclick=$('cancelModal').onclick=closeModal;$('lightbox').onclick=()=>$('lightbox').classList.add('hidden');
+function closeModal(){$('modalBack').classList.add('hidden');$('itemForm').reset();edit=null;photoData=''}
+const setPv=()=>{const pv=$('pv');if(pv)pv.innerHTML=photoData?`<img src="${attr(photoData)}" alt="">`:''};
 
-function openModal(type,item=null,future=false){
-edit={type,id:item?.id||null};photoData=item?.photo||'';
-const isPlan=type==='moment'&&(item?dm(item)>now():future),name={moment:isPlan?'план':'спогад',timer:'план чи таймер',letter:'лист',dream:'ідею'}[type];
-$('modalTitle').textContent=(item?'Змінити ':'Додати ')+name;let h='';
-if(type==='moment')h=`<div class="field"><label>Назва</label><input name="title" maxlength="90" required value="${attr(item?.title||'')}"></div><div class="formgrid"><div class="field"><label>Дата й час</label><input name="date" type="datetime-local" required value="${localDate(item?dm(item):future?now()+7*864e5:now())}"></div><div class="field"><label>Місце (необов'язково)</label><input name="place" value="${attr(item?.place||'')}" placeholder="Де це було чи буде?"></div></div><p class="muted tiny">Дата в майбутньому — це план із таймером зворотного відліку, у минулому — спогад. Коли час настане, план сам стане спогадом.</p><div class="field"><label>Історія або задум</label><textarea name="text" placeholder="Що хочеться пам'ятати чи зробити?">${esc(item?.text||'')}</textarea></div><div class="field"><label>Фотографія</label><input id="uploadPhoto" type="file" accept="image/*"><small class="muted">Фото буде стиснуте перед збереженням.</small><input name="photoUrl" type="url" placeholder="Або пряме посилання на фото" value="${attr(item?.photo?.startsWith('http')?item.photo:'')}"></div>`;
-if(type==='timer')h=`<div class="field"><label>Назва плану чи події</label><input name="title" required maxlength="90" value="${attr(item?.title||'')}"></div><div class="field"><label>Дата й час (минуле чи майбутнє)</label><input name="date" type="datetime-local" required value="${localDate(item?dm(item):now())}"></div><div class="field"><label>Нотатка (необов'язково)</label><textarea name="text">${esc(item?.text||'')}</textarea></div><div class="field"><label>Колір</label><input name="color" type="color" value="${attr(item?.color||'#bd7890')}"></div><div class="field"><label>Фото (необов'язково)</label><input id="uploadPhoto" type="file" accept="image/*"></div>`;
-if(type==='letter')h=`<div class="field"><label>Заголовок</label><input name="title" required maxlength="90" value="${attr(item?.title||'')}" placeholder="Наприклад: Відкрий, коли сумуєш"></div><div class="field"><label>Для кого</label><select name="to"><option value="Марії" ${item?.to==='Марії'?'selected':''}>Марії</option><option value="Мені" ${item?.to==='Мені'?'selected':''}>Мені</option><option value="Нам обом" ${item?.to==='Нам обом'?'selected':''}>Нам обом</option></select></div><div class="field"><label>Текст листа</label><textarea name="text" required placeholder="Напиши те, що хочеш зберегти...">${esc(item?.text||'')}</textarea></div><div class="field"><label>Відкрити після (необов'язково)</label><input name="unlock" type="date" value="${attr(item?.unlock||'')}"></div>`;
-if(type==='dream')h=`<div class="field"><label>Ідея чи мрія</label><input name="title" required maxlength="120" value="${attr(item?.title||'')}" placeholder="Наприклад: Побачити море разом"></div><div class="field"><label>Деталі (необов'язково)</label><textarea name="text">${esc(item?.text||'')}</textarea></div><div class="field"><label>Бажана дата й час (необов'язково, увімкне відлік)</label><input name="date" type="datetime-local" value="${attr(item?.date?(item.date.length===10?item.date+'T00:00':item.date):'')}"></div>`;
-$('modalFields').innerHTML=h;$('modalError').textContent='';$('modalBack').classList.remove('hidden');
-const file=$('uploadPhoto');if(file)file.onchange=async()=>{const f=file.files?.[0];if(!f)return;try{photoData=await compress(f);toast('Фото готове ❤️')}catch{$('modalError').textContent='Не вдалося прочитати фото. Спробуй інше зображення.'}}}
+function openModal(kind,item=null,col=null,isMem=false){
+edit={kind,col:col||(kind==='letter'?'letters':'moments'),id:item?.id||null};photoData=item?.photo||'';
+$('modalTitle').textContent=kind==='letter'?(item?'Змінити лист':'Новий лист'):item?'Змінити запис':isMem?'Новий спогад':'Нова мрія або ідея';let h='';
+if(kind==='item'){const ms=item?item.ms:isMem?now():0;h=`<div class="field"><label>Що це?</label><input name="title" maxlength="120" required value="${attr(item?.title||'')}" placeholder="${isMem?'Наприклад: Наша перша прогулянка':'Наприклад: Поїхати до моря'}"></div><div class="field"><label>Дата й час (необов'язково)</label><input name="date" type="datetime-local" value="${ms?localDate(ms):''}"><small class="muted">Минула дата — це спогад. Майбутня дата або без дати — мрія чи ідея; таймер покаже, скільки залишилось.</small></div><div class="field"><label>Місце (необов'язково)</label><input name="place" value="${attr(item?.place||'')}"></div><div class="field"><label>Нотатка</label><textarea name="text" placeholder="Що хочеться пам'ятати чи зробити?">${esc(item?.text||'')}</textarea></div><div class="field"><label>Фото</label><input id="uploadPhoto" type="file" accept="image/*"><div id="pv" class="pv"></div><input name="photoUrl" type="url" placeholder="Або пряме посилання на фото" value="${attr(item?.photo?.startsWith('http')?item.photo:'')}"></div>`}
+else h=`<div class="field"><label>Заголовок</label><input name="title" required maxlength="90" value="${attr(item?.title||'')}" placeholder="Наприклад: Відкрий, коли сумуєш"></div><div class="field"><label>Для кого</label><select name="to"><option value="Марії" ${item?.to==='Марії'?'selected':''}>Марії</option><option value="Мені" ${item?.to==='Мені'?'selected':''}>Мені</option><option value="Нам обом" ${item?.to==='Нам обом'?'selected':''}>Нам обом</option></select></div><div class="field"><label>Текст листа</label><textarea name="text" required placeholder="Напиши те, що хочеш зберегти...">${esc(item?.text||'')}</textarea></div><div class="field"><label>Відкрити після (необов'язково)</label><input name="unlock" type="date" value="${attr(item?.unlock||'')}"></div>`;
+$('modalFields').innerHTML=h;setPv();$('modalError').textContent='';$('modalBack').classList.remove('hidden');
+const file=$('uploadPhoto');if(file)file.onchange=async()=>{const f=file.files?.[0];if(!f)return;try{photoData=await compress(f);$('itemForm').elements.photoUrl.value='';setPv();toast('Фото додано ❤️')}catch{$('modalError').textContent='Не вдалося обробити фото. Спробуйте інше зображення.'}}}
 
-$('itemForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget),type=edit.type,col=COL[type],old=edit.id?data[col].find(x=>x.id===edit.id)||{}:{};
-const o={updatedAt:serverTimestamp(),title:(f.get('title')||'').trim()};
-if(type==='moment')Object.assign(o,{dateMs:new Date(f.get('date')).getTime(),place:f.get('place').trim(),text:f.get('text').trim(),photo:photoData||f.get('photoUrl').trim()||old.photo||''});
-if(type==='timer')Object.assign(o,{dateMs:new Date(f.get('date')).getTime(),color:f.get('color'),text:(f.get('text')||'').trim(),photo:photoData||old.photo||''});
-if(type==='letter')Object.assign(o,{to:f.get('to'),text:f.get('text').trim(),unlock:f.get('unlock')||''});
-if(type==='dream')Object.assign(o,{text:f.get('text').trim(),date:f.get('date')||'',done:!!old.done});
-if(!o.title||('dateMs'in o&&!Number.isFinite(o.dateMs))){$('modalError').textContent='Перевір назву та дату.';return}
-try{if(edit.id)await updateDoc(doc(db,col,edit.id),o);else await addDoc(collection(db,col),{...o,createdAt:serverTimestamp()});closeModal();toast('Збережено ❤️')}catch(err){console.error(err);$('modalError').textContent='Не вдалося зберегти. Можливо, потрібно оновити правила Firestore.'}};
+$('itemForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget),{kind,col,id}=edit,o={updatedAt:serverTimestamp(),title:(f.get('title')||'').trim()};
+if(kind==='item'){const ds=f.get('date'),ms=ds?new Date(ds).getTime():0;Object.assign(o,{dateMs:ms||null,place:f.get('place').trim(),text:f.get('text').trim(),photo:(f.get('photoUrl')||'').trim()||photoData||''});if(col==='dreams')o.date=ds||''}
+else Object.assign(o,{to:f.get('to'),text:f.get('text').trim(),unlock:f.get('unlock')||''});
+if(!o.title){$('modalError').textContent='Вкажіть назву.';return}
+try{id?await updateDoc(doc(db,col,id),o):await addDoc(collection(db,col),{...o,createdAt:serverTimestamp()});closeModal();toast('Збережено ❤️')}catch(err){console.error(err);$('modalError').textContent='Не вдалося зберегти. Можливо, фото завелике або потрібно оновити правила Firestore.'}};
 
-function renderAll(){
-const past=data.moments.filter(m=>dm(m)<=now()).sort((a,b)=>dm(b)-dm(a)),fut=data.moments.filter(m=>dm(m)>now()).sort((a,b)=>dm(a)-dm(b));
-const first=data.timers.filter(t=>dm(t)<=now()).sort((a,b)=>dm(a)-dm(b))[0];
-if(first){$('togetherCount').textContent=Math.floor((now()-dm(first))/864e5).toLocaleString('uk-UA');$('togetherHint').textContent=first.title}else{$('togetherCount').textContent='♡';$('togetherHint').textContent='Додайте дату початку в таймерах'}
-const up=[...fut.map(m=>({t:m.title,ms:dm(m)})),...data.timers.filter(t=>dm(t)>now()).map(t=>({t:t.title,ms:dm(t)})),...data.dreams.filter(d=>!d.done&&dreamMs(d)>now()).map(d=>({t:d.title,ms:dreamMs(d)}))].sort((a,b)=>a.ms-b.ms).slice(0,3);
-$('upcoming').innerHTML=up.map(u=>`<article class="timer"><h3>${esc(u.t)}</h3><div class="date">${dateFmt(u.ms)}</div><div class="count" data-ts="${u.ms}"></div></article>`).join('')||empty('Поки нічого не заплановано. Додайте перший план ♡');
-$('recentMoments').innerHTML=past.slice(0,2).map(momentCard).join('')||empty('Перші спогади з’являться тут');
-$('momentsList').innerHTML=past.map(momentCard).join('')||empty('Тут будуть ваші спільні спогади');
-const ev=[...data.timers.map(t=>({ms:dm(t),h:timerCard(t)})),...fut.map(m=>({ms:dm(m),h:momentCard(m)}))],nx=ev.filter(x=>x.ms>now()).sort((a,b)=>a.ms-b.ms),ps=ev.filter(x=>x.ms<=now()).sort((a,b)=>b.ms-a.ms);
-$('plansList').innerHTML=[...nx,...ps].map(x=>x.h).join('')||empty('Додайте план або таймер: відлік до події чи від неї');
-$('dreamsList').innerHTML=data.dreams.map(dreamCard).join('')||empty('Додайте ідею чи мрію, навіть без точної дати');
-$('lettersList').innerHTML=data.letters.slice().sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(l=>`<article class="letter"><div class="date">ЛИСТ · ДЛЯ ${esc(l.to||'НАС ОБОХ')}${l.unlock?' · ВІДКРИТИ '+esc(l.unlock):''}</div><h3>${esc(l.title)}</h3><div class="lettertext">${esc(l.text)}</div>${actions('letter',l.id,'letters')}</article>`).join('')||empty('Збережіть перший лист одне одному');
-const photos=past.filter(m=>m.photo);$('galleryList').innerHTML=photos.map(m=>`<img src="${attr(m.photo)}" alt="${attr(m.title)}" loading="lazy" onclick="showPhoto('${m.id}')">`).join('');$('galleryEmpty').textContent=photos.length?'':'Фотографії збережених спогадів з’являться тут.';
-$('momentsCount').textContent=past.length;$('plansCount').textContent=fut.length+data.dreams.filter(d=>!d.done).length;$('lettersCount').textContent=data.letters.length;tick()}
+function renderAll(){const t=now(),all=['moments','timers','dreams'].flatMap(c=>data[c].map(x=>({...x,col:c,ms:getMs(x)}))),
+mem=all.filter(i=>i.ms&&i.ms<=t).sort((a,b)=>b.ms-a.ms),
+wish=all.filter(i=>!(i.ms&&i.ms<=t)).sort((a,b)=>(!!a.done-!!b.done)||((a.ms||9e15)-(b.ms||9e15))),first=mem[mem.length-1];
+if(first){$('togetherCount').textContent=Math.floor((t-first.ms)/864e5).toLocaleString('uk-UA');$('togetherHint').textContent='від «'+first.title+'»'}else{$('togetherCount').textContent='♡';$('togetherHint').textContent='Додайте перший спогад'}
+$('upcoming').innerHTML=wish.filter(i=>i.ms&&!i.done).slice(0,3).map(wishCard).join('')||empty('Поки немає запланованого. Додайте мрію з датою ♡');
+$('recentMoments').innerHTML=mem.slice(0,2).map(memCard).join('')||empty('Перші спогади з’являться тут');
+$('momentsList').innerHTML=mem.map(memCard).join('')||empty('Тут будуть ваші спільні спогади');
+$('dreamsList').innerHTML=wish.map(wishCard).join('')||empty('Запишіть мрію чи ідею, навіть без дати');
+$('lettersList').innerHTML=data.letters.slice().sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(l=>`<article class="letter"><div class="date">Лист для ${esc(l.to||'нас обох')}${l.unlock?' · відкрити '+esc(l.unlock):''}</div><h3>${esc(l.title)}</h3><div class="lettertext">${esc(l.text)}</div>${act({col:'letters',id:l.id})}</article>`).join('')||empty('Збережіть перший лист одне одному');
+const ph=all.filter(i=>i.photo).sort((a,b)=>b.ms-a.ms);$('galleryList').innerHTML=ph.map(i=>`<img src="${attr(i.photo)}" alt="${attr(i.title)}" loading="lazy" onclick="showPhoto('${i.col}','${i.id}')">`).join('');$('galleryEmpty').textContent=ph.length?'':'Фотографії з’являться тут, щойно ви додасте їх до спогадів чи мрій.';
+$('momentsCount').textContent=mem.length;$('plansCount').textContent=wish.filter(i=>!i.done).length;$('lettersCount').textContent=data.letters.length;tick()}
 
-const actions=(type,id,col)=>`<div class="itemactions"><button class="btn light small" onclick="editItem('${type}','${id}')">Змінити</button><button class="btn danger small" onclick="removeItem('${col}','${id}')">Видалити</button></div>`;
-function momentCard(m){return `<article class="moment${dm(m)>now()?' future':''}">${m.photo?`<img src="${attr(m.photo)}" alt="Фото" loading="lazy">`:''}<div class="momentbody"><h3>${esc(m.title)}</h3><div class="date">${dateFmt(m.dateMs)}${m.place?' · '+esc(m.place):''}</div><div class="count" data-ts="${dm(m)}"></div>${m.text?`<div class="desc">${esc(m.text)}</div>`:''}${actions('moment',m.id,'moments')}</div></article>`}
-function timerCard(t){return `<article class="timer" data-timer="${t.id}"><h3>${esc(t.title)}</h3><div class="date">${dateFmt(t.dateMs)}</div><div class="mode tiny muted"></div>${t.text?`<div class="desc">${esc(t.text)}</div>`:''}<div class="digits">${['днів','годин','хвилин','секунд'].map(x=>`<div class="digit"><strong>00</strong><span>${x}</span></div>`).join('')}</div>${actions('timer',t.id,'timers')}</article>`}
-function dreamCard(d){const ms=dreamMs(d);return `<article class="dream ${d.done?'done':''}"><input class="check" type="checkbox" ${d.done?'checked':''} onchange="toggleDream('${d.id}',this.checked)"><div style="flex:1"><h3>${esc(d.title)}</h3>${ms?`<div class="date">${dateFmt(ms)}</div>${d.done?'':`<div class="count" data-ts="${ms}"></div>`}`:''}${d.text?`<div class="desc">${esc(d.text)}</div>`:''}${actions('dream',d.id,'dreams')}</div></article>`}
+const act=i=>`<div class="itemactions"><button class="btn light small" onclick="editItem('${i.col}','${i.id}')">Змінити</button><button class="btn danger small" onclick="removeItem('${i.col}','${i.id}')">Видалити</button></div>`;
+const cnt=ms=>`<div class="count" data-ts="${ms}"></div>`;
+function memCard(i){return `<article class="mem">${i.photo?`<img src="${attr(i.photo)}" alt="" loading="lazy" onclick="showPhoto('${i.col}','${i.id}')">`:'<div class="ph">♡</div>'}<div class="body"><div class="date">${dateFmt(i.ms)}${i.place?' · '+esc(i.place):''}</div><h3>${esc(i.title)}</h3>${cnt(i.ms)}${i.text?`<div class="desc">${esc(i.text)}</div>`:''}${act(i)}</div></article>`}
+function wishCard(i){return `<article class="wish${i.done?' done':''}"><input class="check" type="checkbox" ${i.done?'checked':''} onchange="toggleDone('${i.col}','${i.id}',this.checked)"><div class="wbody"><h3>${esc(i.title)}</h3>${i.ms||i.place?`<div class="date">${i.ms?dateFmt(i.ms):''}${i.ms&&i.place?' · ':''}${esc(i.place||'')}</div>`:''}${i.ms&&!i.done?cnt(i.ms):''}${i.text?`<div class="desc">${esc(i.text)}</div>`:''}${i.photo?`<img class="wimg" src="${attr(i.photo)}" alt="" loading="lazy" onclick="showPhoto('${i.col}','${i.id}')">`:''}${act(i)}</div></article>`}
 
-function tick(){const p=n=>String(n).padStart(2,'0'),n=now();
-document.querySelectorAll('[data-ts]').forEach(el=>{const d=+el.dataset.ts-n,s=Math.floor(Math.abs(d)/1000);el.textContent=(d>0?'Залишилось ':'Минуло ')+Math.floor(s/86400)+' дн '+p(Math.floor(s%86400/3600))+':'+p(Math.floor(s%3600/60))+':'+p(s%60)});
-document.querySelectorAll('[data-timer]').forEach(el=>{const t=data.timers.find(x=>x.id===el.dataset.timer);if(!t)return;const s=Math.floor(Math.abs(dm(t)-n)/1000),v=[Math.floor(s/86400),Math.floor(s%86400/3600),Math.floor(s%3600/60),s%60];el.querySelectorAll('.digit strong').forEach((x,i)=>x.textContent=p(v[i]));el.querySelector('.mode').textContent=dm(t)>n?'Залишилось до події':'Минуло з цієї події'})}
-setInterval(tick,1000);
+function tick(){const p=n=>String(n).padStart(2,'0');document.querySelectorAll('[data-ts]').forEach(el=>{const d=+el.dataset.ts-now(),s=Math.floor(Math.abs(d)/1000);el.textContent=(d>0?'Залишилось ':'Минуло ')+Math.floor(s/86400)+' дн '+p(Math.floor(s%86400/3600))+':'+p(Math.floor(s%3600/60))+':'+p(s%60)})}
+setInterval(tick,1000);setInterval(()=>{if(auth.currentUser)renderAll()},60000);
 
-window.editItem=(type,id)=>openModal(type,data[COL[type]].find(x=>x.id===id));
-window.removeItem=async(col,id)=>{if(!confirm('Видалити цей запис?'))return;try{await deleteDoc(doc(db,col,id));toast('Запис видалено')}catch(e){toast('Не вдалося видалити. Перевір правила доступу.')}};
-window.toggleDream=async(id,done)=>{try{await updateDoc(doc(db,'dreams',id),{done,updatedAt:serverTimestamp()})}catch(e){toast('Не вдалося оновити')}};
-window.showPhoto=id=>{const m=data.moments.find(x=>x.id===id);if(m?.photo)window.open(m.photo,'_blank')};
-function empty(t){return `<div class="empty" style="grid-column:1/-1"><b>♡</b>${t}</div>`}
+window.editItem=(col,id)=>{const it=data[col].find(x=>x.id===id);if(!it)return;col==='letters'?openModal('letter',it,col):openModal('item',{...it,ms:getMs(it)},col)};
+window.removeItem=async(col,id)=>{if(!confirm('Видалити цей запис?'))return;try{await deleteDoc(doc(db,col,id));toast('Запис видалено')}catch(e){toast('Не вдалося видалити. Перевірте правила доступу.')}};
+window.toggleDone=async(col,id,done)=>{try{await updateDoc(doc(db,col,id),{done,updatedAt:serverTimestamp()})}catch(e){toast('Не вдалося оновити')}};
+window.showPhoto=(col,id)=>{const it=data[col].find(x=>x.id===id);if(it?.photo){$('lbImg').src=it.photo;$('lightbox').classList.remove('hidden')}};
+function empty(t){return `<div class="empty"><b>♡</b>${t}</div>`}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function attr(s){return esc(s).replace(/`/g,'&#96;')}
 function dateFmt(ms){return ms?new Intl.DateTimeFormat('uk-UA',{dateStyle:'long',timeStyle:'short'}).format(new Date(ms)):''}
