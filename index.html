@@ -57,7 +57,6 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 
 /* Спогади: фото на першому місці */
 .mem{background:#fff;border-radius:24px;overflow:hidden;box-shadow:var(--shadow)}
-.mem img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;cursor:zoom-in}
 .ph{aspect-ratio:16/7;display:grid;place-items:center;font:80px var(--serif);color:#d98fa5;background:linear-gradient(135deg,#f8e1e7,#f5ead9)}
 .mem .body{padding:18px 22px 18px}
 
@@ -66,17 +65,22 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .wish.done{opacity:.6}.wish.done h3{text-decoration:line-through;text-decoration-color:var(--wine)}
 .wbody{flex:1;min-width:0}
 .check{width:22px;height:22px;accent-color:var(--wine);flex:none;margin-top:4px}
-.wimg{width:100%;max-height:230px;object-fit:cover;border-radius:16px;margin-top:10px;cursor:zoom-in;display:block}
 
 .letter{background:#fffdf9;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:8px 20px 20px 8px;padding:22px 24px;box-shadow:var(--shadow)}
 .letter .lettertext{margin-top:8px;font:italic 500 19px/1.7 var(--serif);white-space:pre-wrap}
 .gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.gallery img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:20px;cursor:zoom-in;box-shadow:var(--shadow);transition:transform .2s}
-.gallery img:hover{transform:scale(1.03)}
 .empty{grid-column:1/-1;text-align:center;padding:38px 20px;color:var(--muted);border:1.5px dashed #e3c9d0;border-radius:22px;background:#ffffff80}
 .empty b{display:block;font:700 44px/1 var(--serif);color:#d98fa5;margin-bottom:6px}
 
-.pv img{width:100%;max-height:220px;object-fit:cover;border-radius:14px}
+.pv img{width:100%;max-height:220px;object-fit:cover;border-radius:14px;display:block;margin-top:8px}
+.zoom{position:relative;overflow:hidden;isolation:isolate;background:var(--rose)}
+.zoom img{display:block;width:100%;height:100%;object-fit:cover;cursor:zoom-in;backface-visibility:hidden;will-change:transform;transition:transform .6s cubic-bezier(.2,.7,.2,1)}
+.zoom:hover img{transform:scale(1.1)}
+.mem .zoom{aspect-ratio:4/3}.wish .zoom{aspect-ratio:16/9;border-radius:16px;margin-top:10px}.gallery .zoom{aspect-ratio:1;border-radius:20px;box-shadow:var(--shadow)}
+.ed{display:grid;gap:8px;margin-top:10px;padding:12px 14px;border:1px solid var(--line);border-radius:16px;background:#fff8f8}
+#edpix{display:grid;gap:8px}.ed label{display:grid;grid-template-columns:112px 1fr;align-items:center;font-size:13px;font-weight:700;color:var(--muted)}
+.ed input[type=range]{padding:0;border:0;background:none;accent-color:var(--wine);height:24px}
+.edbtn{display:flex;gap:8px}.nofilter label{display:none}
 .error{color:#b04a55;font-size:13px;min-height:16px}
 .modalback{position:fixed;inset:0;background:#2b222699;display:grid;place-items:center;padding:14px;z-index:20}
 .modal{width:min(560px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:26px;padding:26px;box-shadow:0 24px 60px #0004}
@@ -113,7 +117,7 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';import{getFirestore,collection,addDoc,doc,updateDoc,deleteDoc,onSnapshot,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 const firebaseConfig={apiKey:'AIzaSyDUBh1vJcb9vd3og8wP8uirFig4Qz_-z50',authDomain:'nash-chas-ed25f.firebaseapp.com',projectId:'nash-chas-ed25f',storageBucket:'nash-chas-ed25f.firebasestorage.app',messagingSenderId:'118702039529',appId:'1:118702039529:web:24c84f319f56d4bb73ab78'};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id),now=()=>Date.now();
-let data={moments:[],timers:[],dreams:[],letters:[]},unsubs=[],edit=null,photoData='';
+let data={moments:[],timers:[],dreams:[],letters:[]},unsubs=[],edit=null,photoData='',srcImg=null,focusY=50,adj={b:100,c:100,s:100,r:0};
 /* Дата запису: dateMs (спогади, таймери) або date (старі мрії). 0 = без дати */
 const getMs=i=>'dateMs'in i?(Number(i.dateMs)||0):(i.date?(new Date(i.date).getTime()||0):0);
 
@@ -125,19 +129,25 @@ $('nav').onclick=e=>{const b=e.target.closest('button[data-view]');if(b)showView
 document.body.addEventListener('click',e=>{const a=e.target.closest('[data-add]');if(a){const t=a.dataset.add;t==='letter'?openModal('letter'):openModal('item',null,'moments',t==='memory')}const g=e.target.closest('[data-go]');if(g)showView(g.dataset.go)});
 function showView(name){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));window.scrollTo({top:0,behavior:'smooth'})}
 $('closeModal').onclick=$('cancelModal').onclick=closeModal;$('lightbox').onclick=()=>$('lightbox').classList.add('hidden');
-function closeModal(){$('modalBack').classList.add('hidden');$('itemForm').reset();edit=null;photoData=''}
-const setPv=()=>{const pv=$('pv');if(pv)pv.innerHTML=photoData?`<img src="${attr(photoData)}" alt="">`:''};
+function closeModal(){$('modalBack').classList.add('hidden');$('itemForm').reset();edit=null;photoData='';srcImg=null}
+const loadImg=src=>new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=src});
+const setPv=()=>{const pv=$('pv');if(!pv)return;pv.innerHTML=photoData?`<img src="${attr(photoData)}" alt="" style="object-position:50% ${focusY}%">`:'';$('ed').classList.toggle('hidden',!photoData);$('edpix').classList.toggle('hidden',!srcImg);$('edpix').classList.toggle('nofilter',!('filter'in CanvasRenderingContext2D.prototype))};
+const syncEd=()=>document.querySelectorAll('#ed [data-k]').forEach(i=>{const k=i.dataset.k;i.value=k==='y'?focusY:adj[k]});
+function render(){if(!srcImg)return;const sw=adj.r%180!==0,W=sw?srcImg.height:srcImg.width,H=sw?srcImg.width:srcImg.height,sc=Math.min(1,1000/Math.max(W,H)),c=document.createElement('canvas');c.width=Math.round(W*sc);c.height=Math.round(H*sc);const x=c.getContext('2d');if('filter'in x)x.filter=`brightness(${adj.b}%) contrast(${adj.c}%) saturate(${adj.s}%)`;x.translate(c.width/2,c.height/2);x.rotate(adj.r*Math.PI/180);const w=srcImg.width*sc,h=srcImg.height*sc;x.drawImage(srcImg,-w/2,-h/2,w,h);let q=.78,d=c.toDataURL('image/jpeg',q);while(d.length>650000&&q>.35){q-=.08;d=c.toDataURL('image/jpeg',q)}if(d.length>850000)throw Error('too big');photoData=d;setPv()}
 
 function openModal(kind,item=null,col=null,isMem=false){
-edit={kind,col:col||(kind==='letter'?'letters':'moments'),id:item?.id||null};photoData=item?.photo||'';
+edit={kind,col:col||(kind==='letter'?'letters':'moments'),id:item?.id||null};photoData=item?.photo||'';srcImg=null;focusY=item?.focus??50;adj={b:100,c:100,s:100,r:0};
 $('modalTitle').textContent=kind==='letter'?(item?'Змінити лист':'Новий лист'):item?'Змінити запис':isMem?'Новий спогад':'Нова мрія або ідея';let h='';
-if(kind==='item'){const ms=item?item.ms:isMem?now():0;h=`<div class="field"><label>Що це?</label><input name="title" maxlength="120" required value="${attr(item?.title||'')}" placeholder="${isMem?'Наприклад: Наша перша прогулянка':'Наприклад: Поїхати до моря'}"></div><div class="field"><label>Дата й час (необов'язково)</label><input name="date" type="datetime-local" value="${ms?localDate(ms):''}"><small class="muted">Минула дата — це спогад. Майбутня дата або без дати — мрія чи ідея; таймер покаже, скільки залишилось.</small></div><div class="field"><label>Місце (необов'язково)</label><input name="place" value="${attr(item?.place||'')}"></div><div class="field"><label>Нотатка</label><textarea name="text" placeholder="Що хочеться пам'ятати чи зробити?">${esc(item?.text||'')}</textarea></div><div class="field"><label>Фото</label><input id="uploadPhoto" type="file" accept="image/*"><div id="pv" class="pv"></div><input name="photoUrl" type="url" placeholder="Або пряме посилання на фото" value="${attr(item?.photo?.startsWith('http')?item.photo:'')}"></div>`}
+if(kind==='item'){const ms=item?item.ms:isMem?now():0;h=`<div class="field"><label>Що це?</label><input name="title" maxlength="120" required value="${attr(item?.title||'')}" placeholder="${isMem?'Наприклад: Наша перша прогулянка':'Наприклад: Поїхати до моря'}"></div><div class="field"><label>Дата й час (необов'язково)</label><input name="date" type="datetime-local" value="${ms?localDate(ms):''}"><small class="muted">Минула дата — це спогад. Майбутня дата або без дати — мрія чи ідея; таймер покаже, скільки залишилось.</small></div><div class="field"><label>Місце (необов'язково)</label><input name="place" value="${attr(item?.place||'')}"></div><div class="field"><label>Нотатка</label><textarea name="text" placeholder="Що хочеться пам'ятати чи зробити?">${esc(item?.text||'')}</textarea></div><div class="field"><label>Фото</label><input id="uploadPhoto" type="file" accept="image/*"><div id="pv" class="pv"></div><div id="ed" class="ed hidden"><div id="edpix" class="hidden"><label>Яскравість<input type="range" min="60" max="140" value="100" data-k="b"></label><label>Контраст<input type="range" min="60" max="140" value="100" data-k="c"></label><label>Насиченість<input type="range" min="0" max="180" value="100" data-k="s"></label><div class="edbtn"><button type="button" id="rot" class="btn light small">Повернути ↻</button><button type="button" id="rst" class="btn light small">Скинути</button></div></div><label>Фокус кадру<input type="range" min="0" max="100" value="50" data-k="y"></label></div><input name="photoUrl" type="url" placeholder="Або пряме посилання на фото" value="${attr(item?.photo?.startsWith('http')?item.photo:'')}"></div>`}
 else h=`<div class="field"><label>Заголовок</label><input name="title" required maxlength="90" value="${attr(item?.title||'')}" placeholder="Наприклад: Відкрий, коли сумуєш"></div><div class="field"><label>Для кого</label><select name="to"><option value="Марії" ${item?.to==='Марії'?'selected':''}>Марії</option><option value="Мені" ${item?.to==='Мені'?'selected':''}>Мені</option><option value="Нам обом" ${item?.to==='Нам обом'?'selected':''}>Нам обом</option></select></div><div class="field"><label>Текст листа</label><textarea name="text" required placeholder="Напиши те, що хочеш зберегти...">${esc(item?.text||'')}</textarea></div><div class="field"><label>Відкрити після (необов'язково)</label><input name="unlock" type="date" value="${attr(item?.unlock||'')}"></div>`;
-$('modalFields').innerHTML=h;setPv();$('modalError').textContent='';$('modalBack').classList.remove('hidden');
-const file=$('uploadPhoto');if(file)file.onchange=async()=>{const f=file.files?.[0];if(!f)return;try{photoData=await compress(f);$('itemForm').elements.photoUrl.value='';setPv();toast('Фото додано ❤️')}catch{$('modalError').textContent='Не вдалося обробити фото. Спробуйте інше зображення.'}}}
+$('modalFields').innerHTML=h;syncEd();setPv();$('modalError').textContent='';$('modalBack').classList.remove('hidden');
+const file=$('uploadPhoto');if(file){file.onchange=async()=>{const f=file.files?.[0];if(!f)return;try{srcImg=await loadImg(URL.createObjectURL(f));adj={b:100,c:100,s:100,r:0};syncEd();render();$('itemForm').elements.photoUrl.value='';toast('Фото додано ❤️')}catch{$('modalError').textContent='Не вдалося обробити фото. Спробуйте інше зображення.'}};
+if(photoData.startsWith('data:'))loadImg(photoData).then(im=>{srcImg=im;setPv()}).catch(()=>{});
+let tm;$('ed').oninput=e=>{const k=e.target.dataset.k;if(!k)return;if(k==='y'){focusY=+e.target.value;setPv()}else{adj[k]=+e.target.value;clearTimeout(tm);tm=setTimeout(()=>{try{render()}catch{}},150)}};
+$('rot').onclick=()=>{adj.r=(adj.r+90)%360;try{render()}catch{}};$('rst').onclick=()=>{adj={b:100,c:100,s:100,r:0};syncEd();try{render()}catch{}}}}
 
 $('itemForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget),{kind,col,id}=edit,o={updatedAt:serverTimestamp(),title:(f.get('title')||'').trim()};
-if(kind==='item'){const ds=f.get('date'),ms=ds?new Date(ds).getTime():0;Object.assign(o,{dateMs:ms||null,place:f.get('place').trim(),text:f.get('text').trim(),photo:(f.get('photoUrl')||'').trim()||photoData||''});if(col==='dreams')o.date=ds||''}
+if(kind==='item'){const ds=f.get('date'),ms=ds?new Date(ds).getTime():0;Object.assign(o,{dateMs:ms||null,place:f.get('place').trim(),text:f.get('text').trim(),photo:(f.get('photoUrl')||'').trim()||photoData||'',focus:focusY});if(col==='dreams')o.date=ds||''}
 else Object.assign(o,{to:f.get('to'),text:f.get('text').trim(),unlock:f.get('unlock')||''});
 if(!o.title){$('modalError').textContent='Вкажіть назву.';return}
 try{id?await updateDoc(doc(db,col,id),o):await addDoc(collection(db,col),{...o,createdAt:serverTimestamp()});closeModal();toast('Збережено ❤️')}catch(err){console.error(err);$('modalError').textContent='Не вдалося зберегти. Можливо, фото завелике або потрібно оновити правила Firestore.'}};
@@ -151,13 +161,14 @@ $('recentMoments').innerHTML=mem.slice(0,2).map(memCard).join('')||empty('Пер
 $('momentsList').innerHTML=mem.map(memCard).join('')||empty('Тут будуть ваші спільні спогади');
 $('dreamsList').innerHTML=wish.map(wishCard).join('')||empty('Запишіть мрію чи ідею, навіть без дати');
 $('lettersList').innerHTML=data.letters.slice().sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(l=>`<article class="letter"><div class="date">Лист для ${esc(l.to||'нас обох')}${l.unlock?' · відкрити '+esc(l.unlock):''}</div><h3>${esc(l.title)}</h3><div class="lettertext">${esc(l.text)}</div>${act({col:'letters',id:l.id})}</article>`).join('')||empty('Збережіть перший лист одне одному');
-const ph=all.filter(i=>i.photo).sort((a,b)=>b.ms-a.ms);$('galleryList').innerHTML=ph.map(i=>`<img src="${attr(i.photo)}" alt="${attr(i.title)}" loading="lazy" onclick="showPhoto('${i.col}','${i.id}')">`).join('');$('galleryEmpty').textContent=ph.length?'':'Фотографії з’являться тут, щойно ви додасте їх до спогадів чи мрій.';
+const ph=all.filter(i=>i.photo).sort((a,b)=>b.ms-a.ms);$('galleryList').innerHTML=ph.map(i=>zimg(i)).join('');$('galleryEmpty').textContent=ph.length?'':'Фотографії з’являться тут, щойно ви додасте їх до спогадів чи мрій.';
 $('momentsCount').textContent=mem.length;$('plansCount').textContent=wish.filter(i=>!i.done).length;$('lettersCount').textContent=data.letters.length;tick()}
 
+const zimg=i=>`<div class="zoom"><img src="${attr(i.photo)}" alt="${attr(i.title||'')}" loading="lazy" style="object-position:50% ${i.focus??50}%" onclick="showPhoto('${i.col}','${i.id}')"></div>`;
 const act=i=>`<div class="itemactions"><button class="btn light small" onclick="editItem('${i.col}','${i.id}')">Змінити</button><button class="btn danger small" onclick="removeItem('${i.col}','${i.id}')">Видалити</button></div>`;
 const cnt=ms=>`<div class="count" data-ts="${ms}"></div>`;
-function memCard(i){return `<article class="mem">${i.photo?`<img src="${attr(i.photo)}" alt="" loading="lazy" onclick="showPhoto('${i.col}','${i.id}')">`:'<div class="ph">♡</div>'}<div class="body"><div class="date">${dateFmt(i.ms)}${i.place?' · '+esc(i.place):''}</div><h3>${esc(i.title)}</h3>${cnt(i.ms)}${i.text?`<div class="desc">${esc(i.text)}</div>`:''}${act(i)}</div></article>`}
-function wishCard(i){return `<article class="wish${i.done?' done':''}"><input class="check" type="checkbox" ${i.done?'checked':''} onchange="toggleDone('${i.col}','${i.id}',this.checked)"><div class="wbody"><h3>${esc(i.title)}</h3>${i.ms||i.place?`<div class="date">${i.ms?dateFmt(i.ms):''}${i.ms&&i.place?' · ':''}${esc(i.place||'')}</div>`:''}${i.ms&&!i.done?cnt(i.ms):''}${i.text?`<div class="desc">${esc(i.text)}</div>`:''}${i.photo?`<img class="wimg" src="${attr(i.photo)}" alt="" loading="lazy" onclick="showPhoto('${i.col}','${i.id}')">`:''}${act(i)}</div></article>`}
+function memCard(i){return `<article class="mem">${i.photo?zimg(i):'<div class="ph">♡</div>'}<div class="body"><div class="date">${dateFmt(i.ms)}${i.place?' · '+esc(i.place):''}</div><h3>${esc(i.title)}</h3>${cnt(i.ms)}${i.text?`<div class="desc">${esc(i.text)}</div>`:''}${act(i)}</div></article>`}
+function wishCard(i){return `<article class="wish${i.done?' done':''}"><input class="check" type="checkbox" ${i.done?'checked':''} onchange="toggleDone('${i.col}','${i.id}',this.checked)"><div class="wbody"><h3>${esc(i.title)}</h3>${i.ms||i.place?`<div class="date">${i.ms?dateFmt(i.ms):''}${i.ms&&i.place?' · ':''}${esc(i.place||'')}</div>`:''}${i.ms&&!i.done?cnt(i.ms):''}${i.text?`<div class="desc">${esc(i.text)}</div>`:''}${i.photo?zimg(i):''}${act(i)}</div></article>`}
 
 function tick(){const p=n=>String(n).padStart(2,'0');document.querySelectorAll('[data-ts]').forEach(el=>{const d=+el.dataset.ts-now(),s=Math.floor(Math.abs(d)/1000);el.textContent=(d>0?'Залишилось ':'Минуло ')+Math.floor(s/86400)+' дн '+p(Math.floor(s%86400/3600))+':'+p(Math.floor(s%3600/60))+':'+p(s%60)})}
 setInterval(tick,1000);setInterval(()=>{if(auth.currentUser)renderAll()},60000);
