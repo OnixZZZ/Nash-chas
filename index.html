@@ -104,14 +104,29 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 #randomMem{grid-template-columns:minmax(0,520px)}#todayList{grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
 .vrow{display:grid;gap:2px;padding:10px 0;border-bottom:1px solid var(--line)}.vrow span{font-size:13px;color:var(--muted)}
 #secret{cursor:default}
+.zoom.vid,.zoom.hasvid{background:#000}.zoom video{width:100%;height:100%;object-fit:cover;display:block}
+.zoom .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px;color:#fff;text-shadow:0 2px 6px #0008;pointer-events:none}
+#lbVid{max-width:100%;max-height:92vh;border-radius:14px}
+.player{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:var(--shadow);margin-bottom:18px}
+#ytPlayer{aspect-ratio:16/9;width:100%;border-radius:16px;overflow:hidden;background:#000}
+.pctl{display:flex;gap:8px;margin-top:12px}.pctl button{flex:1}
+#remindBtn.on{background:var(--wine);color:#fff;border-color:var(--wine)}
+.addtrack{display:flex;gap:8px;margin-bottom:14px}.addtrack input{flex:1;border:1.5px solid var(--line);border-radius:14px;padding:11px 14px}
+.tracklist{display:grid;gap:10px}
+.track{display:flex;align-items:center;gap:12px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:16px}
+.track img{width:72px;height:54px;object-fit:cover;border-radius:10px;cursor:pointer;flex:none}
+.track .tbody{flex:1;min-width:0;cursor:pointer;display:grid}
+.track .tbody b{font-size:15px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.track.on{border-color:var(--wine);background:var(--rose)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 </style>
+<script src="https://www.youtube.com/iframe_api"></script>
 </head><body><main class="shell">
 <header class="brand"><div><div class="brandmark">Наш час ♡</div><small>спогади, які вже були, і мрії, до яких ми йдемо</small></div><div id="userLine" class="userline"></div></header>
-<section id="loginPanel" class="panel login"><h1>Наш маленький простір ♡</h1><p class="muted tiny">Увійдіть, щоб зберігати вашу спільну історію.</p><form id="loginForm"><div class="field"><label>Логін</label><input id="email" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" required></div><div class="field"><label>Пароль</label><input id="password" type="password" autocomplete="current-password" required></div><button class="btn" style="width:100%">Увійти ❤️</button><p id="loginError" class="error"></p></form></section>
-<section id="appPanel" class="hidden"><div class="topline"><div class="muted tiny">Ваш простір для двох 💗</div><button id="logoutBtn" class="btn light small">Вийти</button></div>
-<nav class="nav" id="nav"><button class="active" data-view="dashboard">Огляд</button><button data-view="moments">Спогади</button><button data-view="dreams">Мрії та ідеї</button><button data-view="letters">Листи</button><button data-view="gallery">Галерея</button></nav>
+<section id="loginPanel" class="panel login"><h1>Наш маленький простір ♡</h1><p class="muted tiny">Увійдіть, щоб зберігати вашу спільну історію.</p><form id="loginForm"><div class="field"><label>Логін</label><input id="email" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" required></div><div class="field"><label>Пароль</label><input id="password" type="password" autocomplete="current-password" required></div><div id="inviteField" class="field hidden"><label>Код запрошення</label><input id="invite" type="text" autocapitalize="none" autocorrect="off"></div><button id="loginSubmit" class="btn" style="width:100%">Увійти ❤️</button><p id="loginError" class="error"></p><p class="tiny" style="margin-top:14px"><a href="#" id="toggleAuth">Немає акаунту? Зареєструватися</a></p></form></section>
+<section id="appPanel" class="hidden"><div class="topline"><div class="muted tiny">Ваш простір для двох 💗</div><button id="remindBtn" class="btn light small">🔔 Нагадування</button><button id="logoutBtn" class="btn light small">Вийти</button></div>
+<nav class="nav" id="nav"><button class="active" data-view="dashboard">Огляд</button><button data-view="moments">Спогади</button><button data-view="dreams">Мрії та ідеї</button><button data-view="letters">Листи</button><button data-view="music">Музика</button><button data-view="gallery">Галерея</button></nav>
 <section class="view active" id="view-dashboard"><div class="hero"><h1>Кожна мить — наша.</h1><div class="together"><div class="muted tiny">ми разом вже</div><div id="togetherCount" class="number">—</div><div class="muted tiny">днів нашої історії</div><div id="togetherHint" class="tiny muted"></div></div></div>
 <div class="stats"><div class="stat"><strong id="momentsCount">0</strong><span>спогадів</span></div><div class="stat"><strong id="plansCount">0</strong><span>мрій та ідей</span></div><div class="stat"><strong id="lettersCount">0</strong><span>листів</span></div></div>
 <div id="todaySec" class="hidden"><div class="sectionhead"><h2>Цього дня</h2></div><div id="todayList" class="grid"></div></div>
@@ -121,24 +136,39 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 <section class="view" id="view-moments"><div class="sectionhead"><h2>Наші спогади</h2><button class="btn small" data-add="memory">+ Новий спогад</button></div><div id="momentsList" class="grid"></div></section>
 <section class="view" id="view-dreams"><div class="sectionhead"><h2>Мрії та ідеї</h2><button class="btn small" data-add="dream">+ Нова мрія</button></div><p class="muted tiny" style="margin-top:-6px">Сюди потрапляє все, що ще попереду: з датою на майбутнє або без дати. Коли дата мине, запис сам стане спогадом.</p><div id="dreamsList" class="list"></div></section>
 <section class="view" id="view-letters"><div class="sectionhead"><h2>Наші листи</h2><button class="btn small" data-add="letter">+ Написати лист</button></div><div id="lettersList" class="grid"></div></section>
+<section class="view" id="view-music"><div class="sectionhead"><h2>Наша музика</h2></div>
+<div class="player"><div id="ytPlayer"></div><div id="nowPlaying" class="muted tiny">Оберіть трек зі списку ↓</div><div class="pctl"><button id="pPrev" class="btn light small">⏮ Попередній</button><button id="pPlay" class="btn small">▶ Відтворити</button><button id="pNext" class="btn light small">Наступний ⏭</button></div></div>
+<form id="trackForm" class="addtrack"><input id="trackUrl" type="url" placeholder="Встав посилання на YouTube…" required><button class="btn small" type="submit">+ Додати</button></form><p id="trackError" class="error"></p>
+<div id="playlistList" class="tracklist"></div></section>
 <section class="view" id="view-gallery"><div class="sectionhead"><h2>Наша галерея</h2><button class="btn small" data-add="photo">+ Додати фото</button></div><div id="galleryList" class="gallery"></div><p id="galleryEmpty" class="muted tiny"></p></section>
 </section><div class="footer">Створено з любов'ю для вас двох · Наш час <span id="secret">♡</span></div></main><div id="toast" class="toast hidden"></div>
 <div id="modalBack" class="modalback hidden"><div class="modal"><div class="modalhead"><h2 id="modalTitle">Новий спогад</h2><button id="closeModal" class="btn light small">Закрити</button></div><form id="itemForm"><div id="modalFields"></div><p id="modalError" class="error"></p><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" type="submit">Зберегти</button><button id="cancelModal" class="btn light" type="button">Скасувати</button></div></form></div></div>
-<div id="lightbox" class="modalback hidden"><img id="lbImg" alt=""><button id="lbDel" class="btn danger small hidden">Видалити фото</button></div>
+<div id="lightbox" class="modalback hidden"><img id="lbImg" alt=""><video id="lbVid" class="hidden" controls autoplay></video><button id="lbDel" class="btn danger small hidden">Видалити фото</button></div>
 <div id="visitsBack" class="modalback hidden"><div class="modal"><div class="modalhead"><h2>Історія відвідувань</h2><button id="closeVisits" class="btn light small">Закрити</button></div><p class="muted tiny">Входи на сайт: акаунт, час і пристрій.</p><div id="visitsList"></div></div></div>
 <script type="module">
-import{initializeApp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';import{getFirestore,collection,addDoc,doc,updateDoc,deleteDoc,deleteField,onSnapshot,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';import{getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';import{getFirestore,collection,addDoc,doc,updateDoc,deleteDoc,deleteField,onSnapshot,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';import{getStorage,ref as sref,uploadBytes,getDownloadURL}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js';
 const firebaseConfig={apiKey:'AIzaSyDUBh1vJcb9vd3og8wP8uirFig4Qz_-z50',authDomain:'nash-chas-ed25f.firebaseapp.com',projectId:'nash-chas-ed25f',storageBucket:'nash-chas-ed25f.firebasestorage.app',messagingSenderId:'118702039529',appId:'1:118702039529:web:24c84f319f56d4bb73ab78'};
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id),now=()=>Date.now();
-let data={moments:[],timers:[],dreams:[],letters:[]},unsubs=[],edit=null,photoData='',srcImg=null,queue=[],focusY=50,adj={b:100,c:100,s:100,r:0};
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app),$=id=>document.getElementById(id),now=()=>Date.now();
+const INVITE_CODE='nashchas2026'; /* змініть у файлі на свій код запрошення для реєстрації */
+async function uploadVideo(file){if(file.size>60*1024*1024)throw Error('toobig');const path='media/'+(auth.currentUser?.uid||'u')+'/'+Date.now()+'_'+file.name.replace(/[^\w.-]/g,'_'),r=sref(storage,path);await uploadBytes(r,file);return getDownloadURL(r)}
+let data={moments:[],timers:[],dreams:[],letters:[],playlist:[]},unsubs=[],edit=null,photoData='',videoData='',srcImg=null,queue=[],vqueue=[],focusY=50,adj={b:100,c:100,s:100,r:0};
+let ytPlayer=null,ytReady=false,curIdx=-1,remindOn=(localStorage.getItem('remindOn')==='1');
 /* Дата запису: dateMs (спогади, таймери) або date (старі мрії). 0 = без дати */
 const getMs=i=>'dateMs'in i?(Number(i.dateMs)||0):(i.date?(new Date(i.date).getTime()||0):0);
 
 let rndId=null,lastAll=[];
 /* Логін без пошти: Firebase вимагає email, тому до логіна дописується службовий домен */
 const DOM='@nashchas.invalid',toEmail=v=>{v=v.trim().toLowerCase();return v.includes('@')?v:v+DOM},shortName=e=>(e||'?').replace(DOM,'');
-$('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';try{await signInWithEmailAndPassword(auth,toEmail($('email').value),$('password').value);$('password').value=''}catch(err){$('loginError').textContent=err.code==='auth/invalid-credential'?'Неправильний логін або пароль.':'Не вдалося увійти. Перевірте дані та інтернет.'}};
+let authMode='login';
+$('toggleAuth').onclick=e=>{e.preventDefault();authMode=authMode==='login'?'signup':'login';$('inviteField').classList.toggle('hidden',authMode==='login');$('loginSubmit').textContent=authMode==='login'?'Увійти ❤️':'Зареєструватися ❤️';$('toggleAuth').textContent=authMode==='login'?'Немає акаунту? Зареєструватися':'Вже є акаунт? Увійти';$('loginError').textContent=''};
+$('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';const em=toEmail($('email').value),pw=$('password').value;
+try{if(authMode==='signup'){if($('invite').value.trim()!==INVITE_CODE){$('loginError').textContent='Неправильний код запрошення.';return}
+const cred=await createUserWithEmailAndPassword(auth,em,pw);$('password').value='';
+toast('Акаунт створено ❤️');alert('Акаунт створено!\n\nЩоб цей акаунт отримав доступ до спогадів, власник сайту має додати цей ідентифікатор у правила Firestore та Storage:\n\n'+cred.user.uid+'\n\nДо того часу вхід буде працювати, але дані не завантажаться.')}
+else{await signInWithEmailAndPassword(auth,em,pw);$('password').value=''}}
+catch(err){$('loginError').textContent=err.code==='auth/email-already-in-use'?'Такий логін вже зареєстровано.':err.code==='auth/weak-password'?'Пароль закороткий (мінімум 6 символів).':err.code==='auth/invalid-credential'?'Неправильний логін або пароль.':'Не вдалося виконати дію. Перевірте дані та інтернет.'}};
 $('logoutBtn').onclick=()=>signOut(auth);
+if(remindOn)$('remindBtn').classList.add('on');
 onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').classList.toggle('hidden',!!user);$('appPanel').classList.toggle('hidden',!user);$('userLine').textContent=user?'Ви увійшли разом ♡':'';if(user){logVisit(user);for(const key of Object.keys(data)){unsubs.push(onSnapshot(collection(db,key),snap=>{data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));renderAll()},err=>{console.error(err);toast('Не вдалося завантажити '+key+'. Перевіримо правила доступу.')}))}}else{for(const k in data)data[k]=[];renderAll()}});
 
 $('nav').onclick=e=>{const b=e.target.closest('button[data-view]');if(b)showView(b.dataset.view)};
@@ -158,7 +188,7 @@ addDoc(collection(db,'timers'),{visit:true,email:u.email||'',uid:u.uid,dev:dev+'
 let sc=0,st;$('secret').onclick=()=>{sc++;clearTimeout(st);st=setTimeout(()=>sc=0,2500);if(sc>=5&&auth.currentUser){sc=0;const v=data.timers.filter(x=>x.visit).sort((a,b)=>(b.atMs||0)-(a.atMs||0)).slice(0,80);$('visitsList').innerHTML=v.map(x=>`<div class="vrow"><b>${esc(shortName(x.email))}</b><span>${dateFmt(x.atMs)} · ${esc(x.dev||'')}${x.place?' · 📍 '+esc(x.place):''}</span></div>`).join('')||'<p class="muted">Поки порожньо.</p>';$('visitsBack').classList.remove('hidden')}};
 $('closeVisits').onclick=()=>$('visitsBack').classList.add('hidden');
 $('closeModal').onclick=$('cancelModal').onclick=closeModal;$('lightbox').onclick=()=>$('lightbox').classList.add('hidden');
-function closeModal(){$('modalBack').classList.add('hidden');$('itemForm').reset();edit=null;photoData='';srcImg=null;queue=[]}
+function closeModal(){$('modalBack').classList.add('hidden');$('itemForm').reset();edit=null;photoData='';videoData='';srcImg=null;queue=[];vqueue=[]}
 const loadImg=src=>new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=src});
 const setPv=()=>{const pv=$('pv');if(!pv)return;pv.innerHTML=photoData?`<img src="${attr(photoData)}" alt="" style="object-position:50% ${focusY}%">`:'';$('ed').classList.toggle('hidden',!photoData);$('edpix').classList.toggle('hidden',!srcImg);$('edpix').classList.toggle('nofilter',!('filter'in CanvasRenderingContext2D.prototype))};
 const syncEd=()=>document.querySelectorAll('#ed [data-k]').forEach(i=>{const k=i.dataset.k;i.value=k==='y'?focusY:adj[k]});
@@ -166,20 +196,31 @@ function render(){if(!srcImg)return;const sw=adj.r%180!==0,W=sw?srcImg.height:sr
 
 const ED=`<div id="ed" class="ed hidden"><div id="edpix" class="hidden"><label>Яскравість<input type="range" min="60" max="140" value="100" data-k="b"></label><label>Контраст<input type="range" min="60" max="140" value="100" data-k="c"></label><label>Насиченість<input type="range" min="0" max="180" value="100" data-k="s"></label><div class="edbtn"><button type="button" id="rot" class="btn light small">Повернути ↻</button><button type="button" id="rst" class="btn light small">Скинути</button></div></div><label>Фокус кадру<input type="range" min="0" max="100" value="50" data-k="y"></label></div>`;
 function openModal(kind,item=null,col=null,isMem=false){
-edit={kind,col:col||(kind==='letter'?'letters':kind==='photo'?'timers':'moments'),id:item?.id||null};photoData=item?.photo||'';srcImg=null;queue=[];focusY=item?.focus??50;adj={b:100,c:100,s:100,r:0};
+edit={kind,col:col||(kind==='letter'?'letters':kind==='photo'?'timers':'moments'),id:item?.id||null};photoData=item?.photo||'';videoData=item?.video||'';srcImg=null;queue=[];vqueue=[];focusY=item?.focus??50;adj={b:100,c:100,s:100,r:0};
 $('modalTitle').textContent=kind==='photo'?'Додати фото':kind==='letter'?(item?'Змінити лист':'Новий лист'):item?'Змінити запис':isMem?'Новий спогад':'Нова мрія або ідея';let h='';
-if(kind==='item'){const ms=item?item.ms:isMem?now():0,mm=item?!!(ms&&ms<=now()):isMem;h=`<div class="field"><label>Що це?</label><input name="title" maxlength="120" required value="${attr(item?.title||'')}" placeholder="${isMem?'Наприклад: Наша перша прогулянка':'Наприклад: Поїхати до моря'}"></div><div class="field"><label>${mm?'Дата й час':'Дата й час (необов’язково)'}</label><input name="date" type="datetime-local" ${mm?'required':''} value="${ms?localDate(ms):''}"><small class="muted">Минула дата — це спогад. Майбутня дата або без дати — мрія чи ідея.</small></div><div class="field"><label>Місце (необов'язково)</label><input name="place" value="${attr(item?.place||'')}"></div><div class="field"><label>Нотатка</label><textarea name="text" placeholder="Що хочеться пам'ятати чи зробити?">${esc(item?.text||'')}</textarea></div><div class="field"><label>Фото</label><input id="uploadPhoto" type="file" accept="image/*"><div id="pv" class="pv"></div><div id="ed" class="ed hidden"><div id="edpix" class="hidden"><label>Яскравість<input type="range" min="60" max="140" value="100" data-k="b"></label><label>Контраст<input type="range" min="60" max="140" value="100" data-k="c"></label><label>Насиченість<input type="range" min="0" max="180" value="100" data-k="s"></label><div class="edbtn"><button type="button" id="rot" class="btn light small">Повернути ↻</button><button type="button" id="rst" class="btn light small">Скинути</button></div></div><label>Фокус кадру<input type="range" min="0" max="100" value="50" data-k="y"></label></div><input name="photoUrl" type="url" placeholder="Або пряме посилання на фото" value="${attr(item?.photo?.startsWith('http')?item.photo:'')}"></div>`}
-else if(kind==='photo')h=`<div class="field"><label>Фото (можна вибрати кілька)</label><input id="uploadPhoto" type="file" accept="image/*" multiple><div id="pv" class="pv"></div>${ED}</div>`;
+if(kind==='item'){const ms=item?item.ms:isMem?now():0,mm=item?!!(ms&&ms<=now()):isMem;h=`<div class="field"><label>Що це?</label><input name="title" maxlength="120" required value="${attr(item?.title||'')}" placeholder="${isMem?'Наприклад: Наша перша прогулянка':'Наприклад: Поїхати до моря'}"></div><div class="field"><label>${mm?'Дата й час':'Дата й час (необов’язково)'}</label><input name="date" type="datetime-local" ${mm?'required':''} value="${ms?localDate(ms):''}"><small class="muted">Минула дата — це спогад. Майбутня дата або без дати — мрія чи ідея.</small></div><div class="field"><label>Місце (необов'язково)</label><input name="place" value="${attr(item?.place||'')}"></div><div class="field"><label>Нотатка</label><textarea name="text" placeholder="Що хочеться пам'ятати чи зробити?">${esc(item?.text||'')}</textarea></div><div class="field"><label>Фото</label><input id="uploadPhoto" type="file" accept="image/*"><div id="pv" class="pv"></div><div id="ed" class="ed hidden"><div id="edpix" class="hidden"><label>Яскравість<input type="range" min="60" max="140" value="100" data-k="b"></label><label>Контраст<input type="range" min="60" max="140" value="100" data-k="c"></label><label>Насиченість<input type="range" min="0" max="180" value="100" data-k="s"></label><div class="edbtn"><button type="button" id="rot" class="btn light small">Повернути ↻</button><button type="button" id="rst" class="btn light small">Скинути</button></div></div><label>Фокус кадру<input type="range" min="0" max="100" value="50" data-k="y"></label></div><input name="photoUrl" type="url" placeholder="Або пряме посилання на фото" value="${attr(item?.photo?.startsWith('http')?item.photo:'')}"></div><div class="field"><label>Відео (необов'язково, до 60 МБ)</label><input id="uploadVideo" type="file" accept="video/*"><div id="pvv" class="pv"></div>${item?.video?`<p class="tiny muted">Поточне відео збережено. Оберіть нове, щоб замінити.</p>`:''}</div>`}
+else if(kind==='photo')h=`<div class="field"><label>Фото та відео (можна вибрати кілька, відео до 60 МБ)</label><input id="uploadPhoto" type="file" accept="image/*,video/*" multiple><div id="pv" class="pv"></div>${ED}</div>`;
 else h=`<div class="field"><label>Заголовок</label><input name="title" required maxlength="90" value="${attr(item?.title||'')}" placeholder="Наприклад: Відкрий, коли сумуєш"></div><div class="field"><label>Для кого</label><select name="to"><option value="Марії" ${item?.to==='Марії'?'selected':''}>Марії</option><option value="Мені" ${item?.to==='Мені'?'selected':''}>Мені</option><option value="Нам обом" ${item?.to==='Нам обом'?'selected':''}>Нам обом</option></select></div><div class="field"><label>Текст листа</label><textarea name="text" required placeholder="Напиши те, що хочеш зберегти...">${esc(item?.text||'')}</textarea></div><div class="field"><label>Запечатати до дати (необов’язково)</label><input name="unlock" type="date" value="${attr(item?.unlock||'')}"></div>`;
 $('modalFields').innerHTML=h;syncEd();setPv();$('modalError').textContent='';$('modalBack').classList.remove('hidden');
-const file=$('uploadPhoto');if(file){file.onchange=async()=>{const fs=[...file.files];if(!fs.length)return;queue=[];try{if(fs.length>1){for(const f of fs){srcImg=await loadImg(URL.createObjectURL(f));adj={b:100,c:100,s:100,r:0};render();queue.push(photoData)}srcImg=null;setPv();toast('Вибрано фото: '+fs.length);return}srcImg=await loadImg(URL.createObjectURL(fs[0]));adj={b:100,c:100,s:100,r:0};syncEd();render();const u=$('itemForm').elements.photoUrl;if(u)u.value='';toast('Фото додано ❤️')}catch{$('modalError').textContent='Не вдалося обробити фото. Спробуйте інше зображення.'}};
+const file=$('uploadPhoto');if(file){file.onchange=async()=>{const fs=[...file.files];if(!fs.length)return;const imgs=fs.filter(f=>f.type.startsWith('image/')),vids=fs.filter(f=>f.type.startsWith('video/'));queue=[];vqueue=[];
+try{
+for(const f of vids){if(f.size>60*1024*1024){toast('Відео '+f.name+' більше 60 МБ, пропущено');continue}toast('Завантажуємо відео '+f.name+'…');vqueue.push(await uploadVideo(f))}
+if(imgs.length>1){for(const f of imgs){srcImg=await loadImg(URL.createObjectURL(f));adj={b:100,c:100,s:100,r:0};render();queue.push(photoData)}srcImg=null;photoData=queue[0]||'';setPv();toast('Готово: фото '+imgs.length+(vqueue.length?', відео '+vqueue.length:''));return}
+if(imgs.length===1){srcImg=await loadImg(URL.createObjectURL(imgs[0]));adj={b:100,c:100,s:100,r:0};syncEd();render();const u=$('itemForm').elements.photoUrl;if(u)u.value=''}
+toast(vqueue.length&&!imgs.length?'Відео додано ❤️':'Готово ❤️')
+}catch(err){console.error(err);$('modalError').textContent='Не вдалося обробити файл. Спробуйте інше зображення чи менше відео.'}};
 if(photoData.startsWith('data:'))loadImg(photoData).then(im=>{srcImg=im;setPv()}).catch(()=>{});
 let tm;$('ed').oninput=e=>{const k=e.target.dataset.k;if(!k)return;if(k==='y'){focusY=+e.target.value;setPv()}else{adj[k]=+e.target.value;clearTimeout(tm);tm=setTimeout(()=>{try{render()}catch{}},150)}};
-$('rot').onclick=()=>{adj.r=(adj.r+90)%360;try{render()}catch{}};$('rst').onclick=()=>{adj={b:100,c:100,s:100,r:0};syncEd();try{render()}catch{}}}}
+$('rot').onclick=()=>{adj.r=(adj.r+90)%360;try{render()}catch{}};$('rst').onclick=()=>{adj={b:100,c:100,s:100,r:0};syncEd();try{render()}catch{}}}
+const vfile=$('uploadVideo');if(vfile)vfile.onchange=async()=>{const f=vfile.files?.[0];if(!f)return;if(f.size>60*1024*1024){$('modalError').textContent='Відео завелике (максимум 60 МБ).';vfile.value='';return}
+try{toast('Завантажуємо відео…');videoData=await uploadVideo(f);$('pvv').innerHTML=`<video src="${attr(videoData)}" controls style="width:100%;border-radius:14px"></video>`;toast('Відео додано ❤️')}catch(err){console.error(err);$('modalError').textContent='Не вдалося завантажити відео.'}}}
 
 $('itemForm').onsubmit=async e=>{e.preventDefault();const f=new FormData(e.currentTarget),{kind,col,id}=edit,o={updatedAt:serverTimestamp(),title:(f.get('title')||'').trim()};
-if(kind==='photo'){const list=queue.length>1?queue:photoData?[photoData]:[];if(!list.length){$('modalError').textContent='Оберіть фото.';return}try{for(const p of list)await addDoc(collection(db,'timers'),{gallery:true,photo:p,focus:focusY,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});closeModal();toast('Фото додано ❤️')}catch(err){console.error(err);$('modalError').textContent='Не вдалося зберегти фото.'}return}
-if(kind==='item'){const ds=f.get('date'),ms=ds?new Date(ds).getTime():0;Object.assign(o,{dateMs:ms||null,place:f.get('place').trim(),text:f.get('text').trim(),photo:(f.get('photoUrl')||'').trim()||photoData||'',focus:focusY});if(col==='dreams')o.date=ds||''}
+if(kind==='photo'){const plist=queue.length>1?queue:(photoData&&!vqueue.includes(photoData)?[photoData]:[]),vlist=vqueue;if(!plist.length&&!vlist.length){$('modalError').textContent='Оберіть фото чи відео.';return}
+try{for(const p of plist)await addDoc(collection(db,'timers'),{gallery:true,photo:p,focus:focusY,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+for(const v of vlist)await addDoc(collection(db,'timers'),{gallery:true,video:v,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
+closeModal();toast('Додано ❤️')}catch(err){console.error(err);$('modalError').textContent='Не вдалося зберегти. Перевірте правила Firestore.'}return}
+if(kind==='item'){const ds=f.get('date'),ms=ds?new Date(ds).getTime():0;Object.assign(o,{dateMs:ms||null,place:f.get('place').trim(),text:f.get('text').trim(),photo:(f.get('photoUrl')||'').trim()||photoData||'',video:videoData||'',focus:focusY});if(col==='dreams')o.date=ds||''}
 else Object.assign(o,{to:f.get('to'),text:f.get('text').trim(),unlock:f.get('unlock')||''});
 if(!o.title){$('modalError').textContent='Вкажіть назву.';return}
 try{id?await updateDoc(doc(db,col,id),o):await addDoc(collection(db,col),{...o,createdAt:serverTimestamp()});closeModal();toast('Збережено ❤️')}catch(err){console.error(err);$('modalError').textContent='Не вдалося зберегти. Можливо, фото завелике або потрібно оновити правила Firestore.'}};
@@ -194,17 +235,17 @@ const td=new Date(t),ot=mem.filter(i=>{const d=new Date(i.ms);return d.getMonth(
 $('todaySec').classList.toggle('hidden',!ot.length);$('todayList').innerHTML=ot.map(i=>{const n=td.getFullYear()-new Date(i.ms).getFullYear();return memCard(i,n+' '+yr(n)+' тому')}).join('');
 if(!mem.find(i=>i.id===rndId))rndId=mem.length?mem[Math.floor(Math.random()*mem.length)].id:null;
 $('randomMem').innerHTML=rndId?memCard(mem.find(i=>i.id===rndId)):empty('Додайте перший спогад ♡');
-lastAll=all;
+lastAll=all;renderPlaylist();checkReminders(all);
 $('momentsList').innerHTML=mem.map(i=>memCard(i)).join('')||empty('Тут будуть ваші спільні спогади');
 $('dreamsList').innerHTML=wish.map(wishCard).join('')||empty('Запишіть мрію чи ідею, навіть без дати');
 $('lettersList').innerHTML=data.letters.slice().sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(letterCard).join('')||empty('Збережіть перший лист одне одному');
-const direct=data.timers.filter(x=>x.gallery&&x.photo).map(x=>({...x,col:'timers'})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)),ph=[...direct,...all.filter(i=>i.photo).sort((a,b)=>b.ms-a.ms)];$('galleryList').innerHTML=ph.map(i=>zimg(i)).join('');$('galleryEmpty').textContent=ph.length?'':'Додайте перші фото ♡';
+const direct=data.timers.filter(x=>x.gallery&&(x.photo||x.video)).map(x=>({...x,col:'timers'})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)),ph=[...direct,...all.filter(i=>i.photo||i.video).sort((a,b)=>b.ms-a.ms)];$('galleryList').innerHTML=ph.map(i=>zimg(i)).join('');$('galleryEmpty').textContent=ph.length?'':'Додайте перші фото ♡';
 $('momentsCount').textContent=mem.length;$('plansCount').textContent=wish.filter(i=>!i.done).length;$('lettersCount').textContent=data.letters.length}
 
-const zimg=i=>`<div class="zoom"><img src="${attr(i.photo)}" alt="${attr(i.title||'')}" loading="lazy" style="object-position:50% ${i.focus??50}%" onclick="showPhoto('${i.col}','${i.id}')"></div>`;
+const zimg=i=>i.video&&!i.photo?`<div class="zoom vid" onclick="showPhoto('${i.col}','${i.id}')"><video src="${attr(i.video)}" muted playsinline preload="metadata"></video><span class="play">▶</span></div>`:`<div class="zoom${i.video?' hasvid':''}" onclick="showPhoto('${i.col}','${i.id}')"><img src="${attr(i.photo)}" alt="${attr(i.title||'')}" loading="lazy" style="object-position:50% ${i.focus??50}%">${i.video?'<span class="play">▶</span>':''}</div>`;
 const act=i=>`<div class="itemactions"><button class="btn light small" onclick="editItem('${i.col}','${i.id}')">Змінити</button><button class="btn danger small" onclick="removeItem('${i.col}','${i.id}')">Видалити</button></div>`;
-function memCard(i,tag){return `<article class="mem">${i.photo?zimg(i):'<div class="ph">♡</div>'}<div class="body"><div class="date">${tag?`<b class="tag">${tag}</b> · `:''}${dateFmt(i.ms)}${i.place?' · '+esc(i.place):''}</div><h3>${esc(i.title)}</h3>${i.text?`<div class="desc">${esc(i.text)}</div>`:''}${react(i)}${act(i)}</div></article>`}
-function wishCard(i){return `<article class="wish${i.done?' done':''}"><input class="check" type="checkbox" ${i.done?'checked':''} onchange="toggleDone('${i.col}','${i.id}',this.checked)"><div class="wbody"><h3>${esc(i.title)}</h3>${i.ms||i.place?`<div class="date">${i.ms?dateFmt(i.ms):''}${i.ms&&i.place?' · ':''}${esc(i.place||'')}</div>`:''}${i.text?`<div class="desc">${esc(i.text)}</div>`:''}${i.photo?zimg(i):''}${act(i)}</div></article>`}
+function memCard(i,tag){return `<article class="mem">${i.photo||i.video?zimg(i):'<div class="ph">♡</div>'}<div class="body"><div class="date">${tag?`<b class="tag">${tag}</b> · `:''}${dateFmt(i.ms)}${i.place?' · '+esc(i.place):''}</div><h3>${esc(i.title)}</h3>${i.text?`<div class="desc">${esc(i.text)}</div>`:''}${react(i)}${act(i)}</div></article>`}
+function wishCard(i){return `<article class="wish${i.done?' done':''}"><input class="check" type="checkbox" ${i.done?'checked':''} onchange="toggleDone('${i.col}','${i.id}',this.checked)"><div class="wbody"><h3>${esc(i.title)}</h3>${i.ms||i.place?`<div class="date">${i.ms?dateFmt(i.ms):''}${i.ms&&i.place?' · ':''}${esc(i.place||'')}</div>`:''}${i.text?`<div class="desc">${esc(i.text)}</div>`:''}${i.photo||i.video?zimg(i):''}${act(i)}</div></article>`}
 
 setInterval(()=>{if(auth.currentUser)renderAll()},60000);
 
@@ -212,7 +253,34 @@ window.editItem=(col,id)=>{const it=data[col].find(x=>x.id===id);if(!it)return;c
 window.removeItem=async(col,id)=>{if(!confirm('Видалити цей запис?'))return false;try{await deleteDoc(doc(db,col,id));toast('Запис видалено');return true}catch(e){toast('Не вдалося видалити. Перевірте правила доступу.');return false}};
 $('lbDel').onclick=async e=>{e.stopPropagation();if(await removeItem('timers',e.target.dataset.id))$('lightbox').classList.add('hidden')};
 window.toggleDone=async(col,id,done)=>{try{await updateDoc(doc(db,col,id),{done,updatedAt:serverTimestamp()})}catch(e){toast('Не вдалося оновити')}};
-window.showPhoto=(col,id)=>{const it=data[col].find(x=>x.id===id);if(it?.photo){$('lbImg').src=it.photo;$('lbDel').classList.toggle('hidden',!it.gallery);$('lbDel').dataset.id=id;$('lightbox').classList.remove('hidden')}};
+window.showPhoto=(col,id)=>{const it=data[col].find(x=>x.id===id);if(!it||!(it.photo||it.video))return;const vid=it.video&&!it.photo;$('lbImg').classList.toggle('hidden',vid);$('lbVid').classList.toggle('hidden',!vid);if(vid){$('lbVid').src=it.video}else{$('lbImg').src=it.photo}$('lbDel').classList.toggle('hidden',!it.gallery);$('lbDel').dataset.id=id;$('lightbox').classList.remove('hidden')};
+$('lightbox').onclick=e=>{if(e.target.id==='lightbox')e.currentTarget.classList.add('hidden')};
+
+/* ---- Спільна музика (YouTube) ---- */
+function parseYtId(u){u=(u||'').trim();let m=u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/);if(m)return m[1];m=u.match(/^[\w-]{11}$/);return m?u:null}
+window.onYouTubeIframeAPIReady=()=>{ytPlayer=new YT.Player('ytPlayer',{height:'100%',width:'100%',playerVars:{rel:0,playsinline:1},events:{onReady:()=>{ytReady=true},onStateChange:e=>{if(e.data===YT.PlayerState.PLAYING)$('pPlay').textContent='⏸ Пауза';if(e.data===YT.PlayerState.PAUSED)$('pPlay').textContent='▶ Відтворити';if(e.data===YT.PlayerState.ENDED)playAt(curIdx+1)}}})};
+function playAt(i){const list=sortedPlaylist();if(!list.length)return;if(i<0)i=list.length-1;if(i>=list.length)i=0;curIdx=i;const t=list[i];if(ytReady&&ytPlayer){ytPlayer.loadVideoById(t.videoId);ytPlayer.playVideo()}$('nowPlaying').textContent='Зараз грає: '+(t.title||'YouTube трек');renderPlaylist()}
+$('pPlay').onclick=()=>{if(!ytReady)return;if(curIdx<0)return playAt(0);const st=ytPlayer.getPlayerState();st===1?ytPlayer.pauseVideo():ytPlayer.playVideo()};
+$('pNext').onclick=()=>playAt(curIdx+1);$('pPrev').onclick=()=>playAt(curIdx-1);
+const sortedPlaylist=()=>data.playlist.slice().sort((a,b)=>(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0));
+function renderPlaylist(){const list=sortedPlaylist();$('playlistList').innerHTML=list.map((t,i)=>`<div class="track${i===curIdx?' on':''}"><img src="${attr(t.thumb||('https://img.youtube.com/vi/'+t.videoId+'/mqdefault.jpg'))}" alt="" loading="lazy" onclick="playTrack('${t.id}')"><div class="tbody" onclick="playTrack('${t.id}')"><b>${esc(t.title||'YouTube трек')}</b>${t.author?`<span class="muted tiny">${esc(t.author)}</span>`:''}</div><button class="btn danger small" onclick="removeTrack('${t.id}')">✕</button></div>`).join('')||empty('Додайте першу спільну пісню ♡')}
+window.playTrack=id=>{const list=sortedPlaylist(),i=list.findIndex(x=>x.id===id);if(i>-1)playAt(i)};
+window.removeTrack=async id=>{try{await deleteDoc(doc(db,'playlist',id))}catch(e){toast('Не вдалося видалити трек')}};
+$('trackForm').onsubmit=async e=>{e.preventDefault();$('trackError').textContent='';const url=$('trackUrl').value,vid=parseYtId(url);if(!vid){$('trackError').textContent='Не схоже на посилання YouTube.';return}
+let title='',author='',thumb='';try{const r=await fetch('https://www.youtube.com/oembed?format=json&url='+encodeURIComponent('https://www.youtube.com/watch?v='+vid));if(r.ok){const j=await r.json();title=j.title||'';author=j.author_name||'';thumb=j.thumbnail_url||''}}catch{}
+try{await addDoc(collection(db,'playlist'),{videoId:vid,url,title,author,thumb,addedBy:auth.currentUser?.email||'',createdAt:serverTimestamp()});$('trackUrl').value='';toast('Трек додано ❤️')}catch(err){console.error(err);$('trackError').textContent='Не вдалося зберегти трек.'}};
+
+/* ---- Нагадування (сповіщення браузера про мрії з наближеною датою) ---- */
+$('remindBtn').onclick=async()=>{if(!('Notification'in window)){toast('Браузер не підтримує сповіщення');return}
+if(Notification.permission==='denied'){toast('Сповіщення заблоковані в налаштуваннях браузера');return}
+if(Notification.permission!=='granted'){const p=await Notification.requestPermission();if(p!=='granted'){toast('Дозвіл не надано');return}}
+remindOn=!remindOn;localStorage.setItem('remindOn',remindOn?'1':'0');$('remindBtn').classList.toggle('on',remindOn);toast(remindOn?'Нагадування увімкнено ❤️':'Нагадування вимкнено');if(remindOn)checkReminders(lastAll,true)};
+function checkReminders(all,force){if(!remindOn||!('Notification'in window)||Notification.permission!=='granted')return;
+const today=new Date().toISOString().slice(0,10);if(!force&&localStorage.getItem('remindDay')===today)return;localStorage.setItem('remindDay',today);
+const t=now(),soon=all.filter(i=>!i.done&&i.ms&&i.ms>=t&&i.ms-t<=3*864e5);
+if(soon.length)new Notification('Наш час ♡',{body:soon.map(i=>esc2(i.title)+' · '+dateFmt(i.ms)).slice(0,5).join('\n'),icon:undefined})}
+function esc2(s){return String(s??'')}
+
 function empty(t){return `<div class="empty"><b>♡</b>${t}</div>`}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function attr(s){return esc(s).replace(/`/g,'&#96;')}
