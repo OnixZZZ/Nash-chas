@@ -95,8 +95,6 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
  .hero{padding:34px 14px 28px}.gallery{grid-template-columns:repeat(2,1fr)}.sectionhead h2{font-size:26px}
  .modalback{place-items:end center;padding:0}.modal{border-radius:26px 26px 0 0}#lightbox{place-items:center;padding:10px}
 }
-#map{position:relative;z-index:0;isolation:isolate;height:62vh;min-height:360px;border-radius:24px;overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow)}
-.pin{font-size:28px;line-height:1;filter:drop-shadow(0 2px 3px #0005)}
 .react{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
 .rb{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:2px 12px;font-size:17px;line-height:1.6}
 .rb span{font:700 12px var(--sans);margin-left:5px;color:var(--wine)}.rb.on{background:var(--rose);border-color:#e3b9c4}
@@ -109,12 +107,11 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 </style>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css"><script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 </head><body><main class="shell">
 <header class="brand"><div><div class="brandmark">Наш час ♡</div><small>спогади, які вже були, і мрії, до яких ми йдемо</small></div><div id="userLine" class="userline"></div></header>
 <section id="loginPanel" class="panel login"><h1>Наш маленький простір ♡</h1><p class="muted tiny">Увійдіть, щоб зберігати вашу спільну історію.</p><form id="loginForm"><div class="field"><label>Логін</label><input id="email" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" required></div><div class="field"><label>Пароль</label><input id="password" type="password" autocomplete="current-password" required></div><button class="btn" style="width:100%">Увійти ❤️</button><p id="loginError" class="error"></p></form></section>
 <section id="appPanel" class="hidden"><div class="topline"><div class="muted tiny">Ваш простір для двох 💗</div><button id="logoutBtn" class="btn light small">Вийти</button></div>
-<nav class="nav" id="nav"><button class="active" data-view="dashboard">Огляд</button><button data-view="moments">Спогади</button><button data-view="dreams">Мрії та ідеї</button><button data-view="map">Карта</button><button data-view="letters">Листи</button><button data-view="gallery">Галерея</button></nav>
+<nav class="nav" id="nav"><button class="active" data-view="dashboard">Огляд</button><button data-view="moments">Спогади</button><button data-view="dreams">Мрії та ідеї</button><button data-view="letters">Листи</button><button data-view="gallery">Галерея</button></nav>
 <section class="view active" id="view-dashboard"><div class="hero"><h1>Кожна мить — наша.</h1><div class="together"><div class="muted tiny">ми разом вже</div><div id="togetherCount" class="number">—</div><div class="muted tiny">днів нашої історії</div><div id="togetherHint" class="tiny muted"></div></div></div>
 <div class="stats"><div class="stat"><strong id="momentsCount">0</strong><span>спогадів</span></div><div class="stat"><strong id="plansCount">0</strong><span>мрій та ідей</span></div><div class="stat"><strong id="lettersCount">0</strong><span>листів</span></div></div>
 <div id="todaySec" class="hidden"><div class="sectionhead"><h2>Цього дня</h2></div><div id="todayList" class="grid"></div></div>
@@ -123,7 +120,6 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 <div class="sectionhead"><h2>Останні спогади</h2><button class="btn light small" data-go="moments">Усі спогади</button></div><div id="recentMoments" class="grid"></div></section>
 <section class="view" id="view-moments"><div class="sectionhead"><h2>Наші спогади</h2><button class="btn small" data-add="memory">+ Новий спогад</button></div><div id="momentsList" class="grid"></div></section>
 <section class="view" id="view-dreams"><div class="sectionhead"><h2>Мрії та ідеї</h2><button class="btn small" data-add="dream">+ Нова мрія</button></div><p class="muted tiny" style="margin-top:-6px">Сюди потрапляє все, що ще попереду: з датою на майбутнє або без дати. Коли дата мине, запис сам стане спогадом.</p><div id="dreamsList" class="list"></div></section>
-<section class="view" id="view-map"><div class="sectionhead"><h2>Карта наших місць</h2></div><p id="mapNote" class="muted tiny"></p><div id="map"></div></section>
 <section class="view" id="view-letters"><div class="sectionhead"><h2>Наші листи</h2><button class="btn small" data-add="letter">+ Написати лист</button></div><div id="lettersList" class="grid"></div></section>
 <section class="view" id="view-gallery"><div class="sectionhead"><h2>Наша галерея</h2><button class="btn small" data-add="photo">+ Додати фото</button></div><div id="galleryList" class="gallery"></div><p id="galleryEmpty" class="muted tiny"></p></section>
 </section><div class="footer">Створено з любов'ю для вас двох · Наш час <span id="secret">♡</span></div></main><div id="toast" class="toast hidden"></div>
@@ -138,7 +134,7 @@ let data={moments:[],timers:[],dreams:[],letters:[]},unsubs=[],edit=null,photoDa
 /* Дата запису: dateMs (спогади, таймери) або date (старі мрії). 0 = без дати */
 const getMs=i=>'dateMs'in i?(Number(i.dateMs)||0):(i.date?(new Date(i.date).getTime()||0):0);
 
-let rndId=null,lastAll=[],map,layer,drawId=0;const gc={};
+let rndId=null,lastAll=[];
 /* Логін без пошти: Firebase вимагає email, тому до логіна дописується службовий домен */
 const DOM='@nashchas.invalid',toEmail=v=>{v=v.trim().toLowerCase();return v.includes('@')?v:v+DOM},shortName=e=>(e||'?').replace(DOM,'');
 $('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';try{await signInWithEmailAndPassword(auth,toEmail($('email').value),$('password').value);$('password').value=''}catch(err){$('loginError').textContent=err.code==='auth/invalid-credential'?'Неправильний логін або пароль.':'Не вдалося увійти. Перевірте дані та інтернет.'}};
@@ -147,29 +143,19 @@ onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').
 
 $('nav').onclick=e=>{const b=e.target.closest('button[data-view]');if(b)showView(b.dataset.view)};
 document.body.addEventListener('click',e=>{const a=e.target.closest('[data-add]');if(a){const t=a.dataset.add;t==='letter'?openModal('letter'):t==='photo'?openModal('photo'):openModal('item',null,'moments',t==='memory')}const g=e.target.closest('[data-go]');if(g)showView(g.dataset.go)});
-function showView(name){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));window.scrollTo({top:0,behavior:'smooth'});if(name==='map')drawMap()}
+function showView(name){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));window.scrollTo({top:0,behavior:'smooth'})}
 const EM=['❤️','😍','🥹','😂'],yr=n=>n%10===1&&n%100!==11?'рік':[2,3,4].includes(n%10)&&![12,13,14].includes(n%100)?'роки':'років';
 const react=i=>{const uid=auth.currentUser?.uid,r=i.reactions||{};return `<div class="react">${EM.map(e=>{const n=Object.values(r).filter(v=>v===e).length;return `<button class="rb${r[uid]===e?' on':''}" onclick="reactTo('${i.col}','${i.id}','${e}')">${e}${n?`<span>${n}</span>`:''}</button>`}).join('')}</div>`};
 window.reactTo=async(col,id,e)=>{const uid=auth.currentUser?.uid;if(!uid)return;const it=data[col].find(x=>x.id===id);try{await updateDoc(doc(db,col,id),{['reactions.'+uid]:it?.reactions?.[uid]===e?deleteField():e})}catch(err){console.error(err);toast('Не вдалося поставити реакцію')}};
 function letterCard(l){const d=l.unlock?new Date(l.unlock+'T00:00:00'):null,lk=d&&d>new Date(),ds=d?new Intl.DateTimeFormat('uk-UA',{dateStyle:'long'}).format(d):'';
 return `<article class="letter${lk?' locked':''}"><div class="date">Лист для ${esc(l.to||'нас обох')}${d?(lk?' · 🔒 відкриється '+ds:' · відкрито '+ds):''}</div><h3>${esc(l.title)}</h3>${lk?`<div class="lockmsg">Цей лист запечатаний. Його можна буде прочитати ${ds}.</div><div class="itemactions"><button class="btn danger small" onclick="removeItem('letters','${l.id}')">Видалити</button></div>`:`<div class="lettertext">${esc(l.text)}</div>${act({col:'letters',id:l.id})}`}</article>`}
 $('rndBtn').onclick=()=>{const m=lastAll.filter(i=>i.ms&&i.ms<=now());if(!m.length)return;let n;do{n=m[Math.floor(Math.random()*m.length)].id}while(m.length>1&&n===rndId);rndId=n;renderAll()};
-/* Карта: місця геокодуються через OpenStreetMap (Nominatim) і кешуються в записі */
-const geocode=async q=>{if(gc[q])return gc[q];const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=uk&q='+encodeURIComponent(q)),j=await r.json();return gc[q]=j[0]?{lat:+j[0].lat,lng:+j[0].lon,q}:{lat:null,lng:null,q,none:true}};
-const popup=i=>`<b>${esc(i.title)}</b><br>${i.ms?dateFmt(i.ms)+'<br>':''}${esc(i.place)}`;
-async function drawMap(){const note=$('mapNote');if(!window.L){note.textContent='Карта не завантажилась. Перевірте інтернет.';return}
-if(!map){map=L.map('map').setView([49,31],5);L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:18,attribution:'© OpenStreetMap'}).addTo(map);layer=L.layerGroup().addTo(map)}
-setTimeout(()=>map.invalidateSize(),80);layer.clearLayers();
-const ps=lastAll.filter(i=>(i.place||'').trim());note.textContent=ps.length?'':'Додайте «Місце» до спогадів чи мрій, і вони з’являться тут.';
-const my=++drawId,pts=[],miss=[];
-for(const i of ps){if(my!==drawId)return;let g=i.geo;if(!g||g.q!==i.place){try{g=await geocode(i.place);await updateDoc(doc(db,i.col,i.id),{geo:g})}catch{continue}await new Promise(r=>setTimeout(r,1100))}
-if(g&&g.lat!=null){pts.push([g.lat,g.lng]);L.marker([g.lat,g.lng],{icon:L.divIcon({className:'pin',html:'📍',iconSize:[28,28],iconAnchor:[14,26],popupAnchor:[0,-24]})}).addTo(layer).bindPopup(popup(i))}else miss.push(i.place)}
-if(my!==drawId)return;if(pts.length)map.fitBounds(pts,{padding:[40,40],maxZoom:12});note.textContent=miss.length?'Не знайшов на карті: '+[...new Set(miss)].join(', ')+'. Уточніть місце (місто, країна).':''}
 /* Історія входів: запис при вході, перегляд — 5 швидких натискань на ♡ внизу сторінки */
-function logVisit(u){try{if(sessionStorage.getItem('visited'))return;sessionStorage.setItem('visited','1')}catch{}
+async function logVisit(u){try{if(sessionStorage.getItem('visited'))return;sessionStorage.setItem('visited','1')}catch{}
 const ua=navigator.userAgent,dev=/Mobi|Android|iPhone/i.test(ua)?'телефон':'комп’ютер',br=/Edg\//.test(ua)?'Edge':/OPR\//.test(ua)?'Opera':/Firefox\//.test(ua)?'Firefox':/Chrome\//.test(ua)?'Chrome':/Safari\//.test(ua)?'Safari':'браузер';
-addDoc(collection(db,'timers'),{visit:true,email:u.email||'',uid:u.uid,dev:dev+' · '+br,atMs:now(),createdAt:serverTimestamp()}).catch(e=>console.warn('visit',e))}
-let sc=0,st;$('secret').onclick=()=>{sc++;clearTimeout(st);st=setTimeout(()=>sc=0,2500);if(sc>=5&&auth.currentUser){sc=0;const v=data.timers.filter(x=>x.visit).sort((a,b)=>(b.atMs||0)-(a.atMs||0)).slice(0,80);$('visitsList').innerHTML=v.map(x=>`<div class="vrow"><b>${esc(shortName(x.email))}</b><span>${dateFmt(x.atMs)} · ${esc(x.dev||'')}</span></div>`).join('')||'<p class="muted">Поки порожньо.</p>';$('visitsBack').classList.remove('hidden')}};
+let place='';try{const r=await fetch('https://ipapi.co/json/'),j=await r.json();if(j&&!j.error)place=[j.city,j.country_name].filter(Boolean).join(', ')}catch{}
+addDoc(collection(db,'timers'),{visit:true,email:u.email||'',uid:u.uid,dev:dev+' · '+br,place,atMs:now(),createdAt:serverTimestamp()}).catch(e=>console.warn('visit',e))}
+let sc=0,st;$('secret').onclick=()=>{sc++;clearTimeout(st);st=setTimeout(()=>sc=0,2500);if(sc>=5&&auth.currentUser){sc=0;const v=data.timers.filter(x=>x.visit).sort((a,b)=>(b.atMs||0)-(a.atMs||0)).slice(0,80);$('visitsList').innerHTML=v.map(x=>`<div class="vrow"><b>${esc(shortName(x.email))}</b><span>${dateFmt(x.atMs)} · ${esc(x.dev||'')}${x.place?' · 📍 '+esc(x.place):''}</span></div>`).join('')||'<p class="muted">Поки порожньо.</p>';$('visitsBack').classList.remove('hidden')}};
 $('closeVisits').onclick=()=>$('visitsBack').classList.add('hidden');
 $('closeModal').onclick=$('cancelModal').onclick=closeModal;$('lightbox').onclick=()=>$('lightbox').classList.add('hidden');
 function closeModal(){$('modalBack').classList.add('hidden');$('itemForm').reset();edit=null;photoData='';srcImg=null;queue=[]}
@@ -208,7 +194,7 @@ const td=new Date(t),ot=mem.filter(i=>{const d=new Date(i.ms);return d.getMonth(
 $('todaySec').classList.toggle('hidden',!ot.length);$('todayList').innerHTML=ot.map(i=>{const n=td.getFullYear()-new Date(i.ms).getFullYear();return memCard(i,n+' '+yr(n)+' тому')}).join('');
 if(!mem.find(i=>i.id===rndId))rndId=mem.length?mem[Math.floor(Math.random()*mem.length)].id:null;
 $('randomMem').innerHTML=rndId?memCard(mem.find(i=>i.id===rndId)):empty('Додайте перший спогад ♡');
-lastAll=all;if($('view-map').classList.contains('active'))drawMap();
+lastAll=all;
 $('momentsList').innerHTML=mem.map(i=>memCard(i)).join('')||empty('Тут будуть ваші спільні спогади');
 $('dreamsList').innerHTML=wish.map(wishCard).join('')||empty('Запишіть мрію чи ідею, навіть без дати');
 $('lettersList').innerHTML=data.letters.slice().sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(letterCard).join('')||empty('Збережіть перший лист одне одному');
