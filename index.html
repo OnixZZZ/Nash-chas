@@ -21,9 +21,14 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}
 .userline{font-size:13px;color:var(--muted)}
 .topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:6px 0 4px}
 
-.nav{position:sticky;top:0;z-index:5;display:flex;gap:26px;overflow:auto;padding:0 2px;margin-bottom:26px;background:#faf6f2ee;backdrop-filter:blur(10px);border-bottom:1px solid var(--line);scrollbar-width:none}
-.nav button{white-space:nowrap;background:none;border:0;border-bottom:2px solid transparent;padding:13px 2px;color:var(--muted);font-weight:700;font-size:15px}
-.nav button.active{color:var(--wine);border-bottom-color:var(--wine)}
+.navgroups{position:sticky;top:0;z-index:6;display:flex;gap:10px;overflow:auto;padding:12px 2px;margin-bottom:6px;background:#faf6f2ee;backdrop-filter:blur(10px);border-bottom:1px solid var(--line);scrollbar-width:none}
+.ng{flex:none;display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:9px 18px 9px 10px;color:var(--muted);font-weight:700;font-size:14px}
+.ngIcon{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--rose);font-size:15px}
+.ng.active{background:var(--wine);color:#fff;border-color:var(--wine)}
+.ng.active .ngIcon{background:#ffffff33}
+.nav{position:sticky;top:57px;z-index:5;display:flex;gap:10px;overflow:auto;padding:4px 2px 14px;margin-bottom:20px;background:#faf6f2ee;backdrop-filter:blur(10px);border-bottom:1px solid var(--line);scrollbar-width:none}
+.nav button{white-space:nowrap;background:#fff;border:1.5px solid var(--line);border-radius:99px;padding:9px 18px;color:var(--muted);font-weight:700;font-size:14px}
+.nav button.active{color:#fff;background:var(--wine);border-color:var(--wine)}
 .view{display:none}.view.active{display:block}
 
 .panel{background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:var(--shadow)}
@@ -93,6 +98,8 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .footer{text-align:center;color:var(--muted);font:italic 16px var(--serif);margin-top:46px}
 @media(max-width:720px){
  .shell{padding:16px 14px 50px}.quickadd{gap:9px}.qa{width:66px;padding:11px 2px 8px}.qaIcon{width:36px;height:36px;font-size:17px}.brandmark{font-size:30px}.grid{grid-template-columns:1fr;gap:18px}
+ .navgroups{top:0;padding:9px 2px}.ng{padding:7px 14px 7px 7px;font-size:13px}.ngIcon{width:26px;height:26px;font-size:13px}.ng span:last-child{display:none}.ng.active span:last-child{display:inline}
+ .nav{top:46px;padding:4px 2px 10px}.nav button{padding:7px 14px;font-size:13px}
  .hero{padding:34px 14px 28px}.gallery{grid-template-columns:repeat(2,1fr)}.sectionhead h2{font-size:26px}
  .modalback{place-items:end center;padding:0}.modal{border-radius:26px 26px 0 0}#lightbox{place-items:center;padding:10px}
 }
@@ -156,7 +163,22 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 <header class="brand"><div><div class="brandmark">Наш час ♡</div><small>спогади, які вже були, і мрії, до яких ми йдемо</small></div><div id="userLine" class="userline"></div></header>
 <section id="loginPanel" class="panel login"><h1>Наш маленький простір ♡</h1><p class="muted tiny">Увійдіть, щоб зберігати вашу спільну історію.</p><form id="loginForm"><div class="field"><label>Логін</label><input id="email" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" required></div><div class="field"><label>Пароль</label><input id="password" type="password" autocomplete="current-password" required></div><button id="loginSubmit" class="btn" style="width:100%">Увійти ❤️</button><p id="loginError" class="error"></p></form></section>
 <section id="appPanel" class="hidden"><div class="topline"><div class="muted tiny">Ваш простір для двох 💗</div><button id="remindBtn" class="btn light small">🔔 Нагадування</button><button id="logoutBtn" class="btn light small">Вийти</button></div>
-<nav class="nav" id="nav"><button class="active" data-view="dashboard">Огляд</button><button data-view="moments">Спогади</button><button data-view="dreams">Мрії та ідеї</button><button data-view="letters">Листи</button><button data-view="wishlist">Бажання</button><button data-view="movies">Фільми</button><button data-view="mood">Настрій</button><button data-view="music">Музика</button><button data-view="gallery">Галерея</button></nav>
+<nav class="navgroups" id="navGroups">
+<button class="ng active" data-view="dashboard"><span class="ngIcon">🏠</span><span>Дім</span></button>
+<button class="ng" data-group="story"><span class="ngIcon">📖</span><span>Історія</span></button>
+<button class="ng" data-group="together"><span class="ngIcon">💞</span><span>Разом</span></button>
+<button class="ng" data-group="media"><span class="ngIcon">🎞</span><span>Медіа</span></button>
+</nav>
+<nav class="nav hidden" id="nav">
+<button data-view="moments" data-group="story">📸 Спогади</button>
+<button data-view="dreams" data-group="story">✨ Мрії</button>
+<button data-view="letters" data-group="together">💌 Листи</button>
+<button data-view="wishlist" data-group="together">🎁 Бажання</button>
+<button data-view="movies" data-group="together">🎬 Фільми</button>
+<button data-view="mood" data-group="together">💭 Настрій</button>
+<button data-view="music" data-group="media">🎵 Музика</button>
+<button data-view="gallery" data-group="media">🖼 Галерея</button>
+</nav>
 <section class="view active" id="view-dashboard"><div class="hero"><h1 id="greeting">Кожна мить — наша.</h1><div class="together"><div class="muted tiny">ми разом вже</div><div id="togetherCount" class="number">—</div><div class="muted tiny">днів нашої історії</div><div id="togetherHint" class="tiny muted"></div></div></div>
 <div class="quickadd" id="quickAdd"></div>
 <div class="stats"><div class="stat"><strong id="momentsCount">0</strong><span>спогадів</span></div><div class="stat"><strong id="plansCount">0</strong><span>мрій та ідей</span></div><div class="stat"><strong id="lettersCount">0</strong><span>листів</span></div></div>
@@ -166,7 +188,7 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 <div class="sectionhead"><h2>Найближче</h2><button class="btn light small" data-go="dreams">Усі мрії</button></div><div id="upcoming" class="list"></div>
 <div class="sectionhead"><h2>Останні спогади</h2><button class="btn light small" data-go="moments">Усі спогади</button></div><div id="recentMoments" class="grid"></div></section>
 <section class="view" id="view-moments"><div class="sectionhead"><h2>Наші спогади</h2><button class="btn small" data-add="memory">+ Новий спогад</button></div><div id="momentsList" class="grid"></div></section>
-<section class="view" id="view-dreams"><div class="sectionhead"><h2>Мрії та ідеї</h2><button class="btn small" data-add="dream">+ Нова мрія</button></div><p class="muted tiny" style="margin-top:-6px">Сюди потрапляє все, що ще попереду: з датою на майбутнє або без дати. Коли дата мине, запис сам стане спогадом.</p><div id="dreamsList" class="list"></div></section>
+<section class="view" id="view-dreams"><div class="sectionhead"><h2>Наші мрії</h2><button class="btn small" data-add="dream">+ Нова мрія</button></div><p class="muted tiny" style="margin-top:-6px">Сюди потрапляє все, що ще попереду: з датою на майбутнє або без дати. Коли дата мине, запис сам стане спогадом.</p><div id="dreamsList" class="list"></div></section>
 <section class="view" id="view-letters"><div class="sectionhead"><h2>Наші листи</h2><button class="btn small" data-add="letter">+ Написати лист</button></div><div id="lettersList" class="grid"></div></section>
 <section class="view" id="view-wishlist"><div class="sectionhead"><h2>Список бажань</h2></div><p class="muted tiny" style="margin-top:-6px">Свій список бачите тільки ви, без позначок «заброньовано» — щоб лишався сюрприз. Список партнера видно повністю.</p>
 <div class="whoTabs" id="whoTabs"></div>
@@ -190,17 +212,21 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 <div id="lightbox" class="modalback hidden"><img id="lbImg" alt=""><video id="lbVid" class="hidden" controls autoplay></video><button id="lbDel" class="btn danger small hidden">Видалити фото</button></div>
 <div id="visitsBack" class="modalback hidden"><div class="modal"><div class="modalhead"><h2>Історія відвідувань</h2><button id="closeVisits" class="btn light small">Закрити</button></div><p class="muted tiny">Входи на сайт: акаунт, час і пристрій.</p><div id="visitsList"></div></div></div>
 <script type="module">
-import{initializeApp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';import{getFirestore,collection,addDoc,doc,setDoc,updateDoc,deleteDoc,deleteField,onSnapshot,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';import{getStorage,ref as sref,uploadBytesResumable,getDownloadURL}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js';
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';import{getFirestore,collection,addDoc,doc,setDoc,updateDoc,deleteDoc,deleteField,onSnapshot,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
 const firebaseConfig={apiKey:'AIzaSyDUBh1vJcb9vd3og8wP8uirFig4Qz_-z50',authDomain:'nash-chas-ed25f.firebaseapp.com',projectId:'nash-chas-ed25f',storageBucket:'nash-chas-ed25f.firebasestorage.app',messagingSenderId:'118702039529',appId:'1:118702039529:web:24c84f319f56d4bb73ab78'};
-const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app),$=id=>document.getElementById(id),now=()=>Date.now();
-function uploadToStorage(file,path,onProgress){return new Promise((resolve,reject)=>{
-const r=sref(storage,path),task=uploadBytesResumable(r,file);
-const to=setTimeout(()=>{task.cancel();reject(Object.assign(Error('timeout'),{code:'timeout'}))},45000);
-task.on('state_changed',snap=>{clearTimeout(to);onProgress?.(Math.round(100*snap.bytesTransferred/(snap.totalBytes||1)))},
-err=>{clearTimeout(to);reject(err)},
-async()=>{clearTimeout(to);try{resolve(await getDownloadURL(task.snapshot.ref))}catch(e){reject(e)}})
+const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),$=id=>document.getElementById(id),now=()=>Date.now();
+/* Фото й відео зберігаються на Cloudinary (безкоштовно, без картки) — не в Firebase */
+const CLOUD_NAME='zbymoec3',UPLOAD_PRESET='nash-chas';
+function uploadToCloudinary(file,onProgress){return new Promise((resolve,reject)=>{
+const fd=new FormData();fd.append('file',file);fd.append('upload_preset',UPLOAD_PRESET);
+const xhr=new XMLHttpRequest();xhr.open('POST','https://api.cloudinary.com/v1_1/'+CLOUD_NAME+'/auto/upload');xhr.timeout=45000;
+xhr.upload.onprogress=e=>{if(e.lengthComputable)onProgress?.(Math.round(100*e.loaded/e.total))};
+xhr.onload=()=>{try{const r=JSON.parse(xhr.responseText);if(xhr.status>=200&&xhr.status<300&&r.secure_url)resolve(r.secure_url);else reject(Object.assign(Error(r.error?.message||'upload failed'),{code:'upload'}))}catch(e){reject(e)}};
+xhr.onerror=()=>reject(Object.assign(Error('network'),{code:'network'}));
+xhr.ontimeout=()=>reject(Object.assign(Error('timeout'),{code:'timeout'}));
+xhr.send(fd)
 })}
-async function uploadVideo(file,onProgress){if(file.size>60*1024*1024)throw Error('toobig');const path='media/'+(auth.currentUser?.uid||'u')+'/'+Date.now()+'_'+file.name.replace(/[^\w.-]/g,'_');return uploadToStorage(file,path,onProgress)}
+async function uploadVideo(file,onProgress){if(file.size>60*1024*1024)throw Error('toobig');return uploadToCloudinary(file,onProgress)}
 let data={moments:[],timers:[],dreams:[],letters:[],playlist:[],wishlist:[],movies:[],moods:[]},unsubs=[],edit=null,photoData='',videoData='',srcImg=null,queue=[],vqueue=[],focusY=50,adj={b:100,c:100,s:100,r:0};
 let whoFilter='mine';
 let ytPlayer=null,ytReady=false,curIdx=-1,remindOn=(localStorage.getItem('remindOn')==='1'),swReg=null;
@@ -222,8 +248,15 @@ if(remindOn)$('remindBtn').classList.add('on');
 onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').classList.toggle('hidden',!!user);$('appPanel').classList.toggle('hidden',!user);$('userLine').textContent=user?'Ви увійшли разом ♡':'';if(user){logVisit(user);for(const key of Object.keys(data)){unsubs.push(onSnapshot(collection(db,key),snap=>{data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));renderAll()},err=>{console.error(err);toast('Не вдалося завантажити '+key+'. Перевіримо правила доступу.')}))}}else{for(const k in data)data[k]=[];renderAll()}});
 
 $('nav').onclick=e=>{const b=e.target.closest('button[data-view]');if(b)showView(b.dataset.view)};
+const GROUP_OF={moments:'story',dreams:'story',letters:'together',wishlist:'together',movies:'together',mood:'together',music:'media',gallery:'media'};
+$('navGroups').onclick=e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.view)return showView(b.dataset.view);const g=b.dataset.group,first=[...document.querySelectorAll('#nav button')].find(x=>x.dataset.group===g);if(first)showView(first.dataset.view)};
 document.body.addEventListener('click',e=>{const a=e.target.closest('[data-add]');if(a){const t=a.dataset.add;t==='letter'?openModal('letter'):t==='photo'?openModal('photo'):openModal('item',null,'moments',t==='memory')}const g=e.target.closest('[data-go]');if(g)showView(g.dataset.go)});
-function showView(name){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));window.scrollTo({top:0,behavior:'smooth'})}
+function showView(name){document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===name));document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id==='view-'+name));
+const group=GROUP_OF[name]||'';
+document.querySelectorAll('.ng').forEach(b=>b.classList.toggle('active',b.dataset.view==='dashboard'?name==='dashboard':b.dataset.group===group));
+if(group){$('nav').classList.remove('hidden');document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('hidden',b.dataset.group!==group))}
+else{$('nav').classList.add('hidden')}
+window.scrollTo({top:0,behavior:'smooth'})}
 const EM=['❤️','😍','🥹','😂'],yr=n=>n%10===1&&n%100!==11?'рік':[2,3,4].includes(n%10)&&![12,13,14].includes(n%100)?'роки':'років';
 const react=i=>{const uid=auth.currentUser?.uid,r=i.reactions||{};return `<div class="react">${EM.map(e=>{const n=Object.values(r).filter(v=>v===e).length;return `<button class="rb${r[uid]===e?' on':''}" onclick="reactTo('${i.col}','${i.id}','${e}')">${e}${n?`<span>${n}</span>`:''}</button>`}).join('')}</div>`};
 window.reactTo=async(col,id,e)=>{const uid=auth.currentUser?.uid;if(!uid)return;const it=data[col].find(x=>x.id===id);try{await updateDoc(doc(db,col,id),{['reactions.'+uid]:it?.reactions?.[uid]===e?deleteField():e})}catch(err){console.error(err);toast('Не вдалося поставити реакцію')}};
