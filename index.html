@@ -92,7 +92,7 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:30;padding:10px 22px;font-size:14px;font-weight:700;color:#fff;background:var(--ink);border-radius:99px;box-shadow:var(--shadow)}
 .footer{text-align:center;color:var(--muted);font:italic 16px var(--serif);margin-top:46px}
 @media(max-width:720px){
- .shell{padding:16px 14px 50px}.brandmark{font-size:30px}.grid{grid-template-columns:1fr;gap:18px}
+ .shell{padding:16px 14px 50px}.quickadd{gap:9px}.qa{width:66px;padding:11px 2px 8px}.qaIcon{width:36px;height:36px;font-size:17px}.brandmark{font-size:30px}.grid{grid-template-columns:1fr;gap:18px}
  .hero{padding:34px 14px 28px}.gallery{grid-template-columns:repeat(2,1fr)}.sectionhead h2{font-size:26px}
  .modalback{place-items:end center;padding:0}.modal{border-radius:26px 26px 0 0}#lightbox{place-items:center;padding:10px}
 }
@@ -133,17 +133,34 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .moodrow{align-items:flex-start}
 .moodrow .me{font-size:30px;line-height:1}
 #moodText{width:100%;min-height:70px}
+.quickadd{display:flex;gap:12px;overflow-x:auto;padding:4px 2px 10px;margin:4px 0 20px;scrollbar-width:none}
+.quickadd::-webkit-scrollbar{display:none}
+.qa{flex:none;display:flex;flex-direction:column;align-items:center;gap:6px;width:76px;padding:14px 4px 10px;border:0;border-radius:20px;background:#fff;box-shadow:var(--shadow);transition:transform .15s}
+.qa:active{transform:scale(.96)}
+.qaIcon{width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:50%;font-size:20px}
+.qaLabel{font-size:12px;font-weight:700;color:var(--ink)}
+.qa-moment .qaIcon{background:var(--rose)}
+.qa-dream .qaIcon{background:#fff0b8}
+.qa-letter .qaIcon{background:#e4dcfd}
+.qa-track .qaIcon{background:#cdeedd}
+.qa-wish .qaIcon{background:#ffdcc7}
+.qa-movie .qaIcon{background:#d9ecff}
+.activity{display:grid;gap:8px;margin-bottom:6px}
+.arow{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border:1px solid var(--line);border-radius:16px;font-size:14px}
+.aicon{font-size:18px;flex:none}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 </style>
 <script src="https://www.youtube.com/iframe_api"></script>
 </head><body><main class="shell">
 <header class="brand"><div><div class="brandmark">Наш час ♡</div><small>спогади, які вже були, і мрії, до яких ми йдемо</small></div><div id="userLine" class="userline"></div></header>
-<section id="loginPanel" class="panel login"><h1>Наш маленький простір ♡</h1><p class="muted tiny">Увійдіть, щоб зберігати вашу спільну історію.</p><form id="loginForm"><div class="field"><label>Логін</label><input id="email" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" required></div><div class="field"><label>Пароль</label><input id="password" type="password" autocomplete="current-password" required></div><div id="inviteField" class="field hidden"><label>Код запрошення</label><input id="invite" type="text" autocapitalize="none" autocorrect="off"></div><button id="loginSubmit" class="btn" style="width:100%">Увійти ❤️</button><p id="loginError" class="error"></p><p class="tiny" style="margin-top:14px"><a href="#" id="toggleAuth">Немає акаунту? Зареєструватися</a></p></form></section>
+<section id="loginPanel" class="panel login"><h1>Наш маленький простір ♡</h1><p class="muted tiny">Увійдіть, щоб зберігати вашу спільну історію.</p><form id="loginForm"><div class="field"><label>Логін</label><input id="email" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" required></div><div class="field"><label>Пароль</label><input id="password" type="password" autocomplete="current-password" required></div><button id="loginSubmit" class="btn" style="width:100%">Увійти ❤️</button><p id="loginError" class="error"></p></form></section>
 <section id="appPanel" class="hidden"><div class="topline"><div class="muted tiny">Ваш простір для двох 💗</div><button id="remindBtn" class="btn light small">🔔 Нагадування</button><button id="logoutBtn" class="btn light small">Вийти</button></div>
 <nav class="nav" id="nav"><button class="active" data-view="dashboard">Огляд</button><button data-view="moments">Спогади</button><button data-view="dreams">Мрії та ідеї</button><button data-view="letters">Листи</button><button data-view="wishlist">Бажання</button><button data-view="movies">Фільми</button><button data-view="mood">Настрій</button><button data-view="music">Музика</button><button data-view="gallery">Галерея</button></nav>
-<section class="view active" id="view-dashboard"><div class="hero"><h1>Кожна мить — наша.</h1><div class="together"><div class="muted tiny">ми разом вже</div><div id="togetherCount" class="number">—</div><div class="muted tiny">днів нашої історії</div><div id="togetherHint" class="tiny muted"></div></div></div>
+<section class="view active" id="view-dashboard"><div class="hero"><h1 id="greeting">Кожна мить — наша.</h1><div class="together"><div class="muted tiny">ми разом вже</div><div id="togetherCount" class="number">—</div><div class="muted tiny">днів нашої історії</div><div id="togetherHint" class="tiny muted"></div></div></div>
+<div class="quickadd" id="quickAdd"></div>
 <div class="stats"><div class="stat"><strong id="momentsCount">0</strong><span>спогадів</span></div><div class="stat"><strong id="plansCount">0</strong><span>мрій та ідей</span></div><div class="stat"><strong id="lettersCount">0</strong><span>листів</span></div></div>
+<div class="sectionhead"><h2>Остання активність</h2></div><div id="activityList" class="activity"></div>
 <div id="todaySec" class="hidden"><div class="sectionhead"><h2>Цього дня</h2></div><div id="todayList" class="grid"></div></div>
 <div class="sectionhead"><h2>Згадаймо</h2><button id="rndBtn" class="btn light small">Інший спогад</button></div><div id="randomMem" class="grid"></div>
 <div class="sectionhead"><h2>Найближче</h2><button class="btn light small" data-go="dreams">Усі мрії</button></div><div id="upcoming" class="list"></div>
@@ -173,10 +190,9 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 <div id="lightbox" class="modalback hidden"><img id="lbImg" alt=""><video id="lbVid" class="hidden" controls autoplay></video><button id="lbDel" class="btn danger small hidden">Видалити фото</button></div>
 <div id="visitsBack" class="modalback hidden"><div class="modal"><div class="modalhead"><h2>Історія відвідувань</h2><button id="closeVisits" class="btn light small">Закрити</button></div><p class="muted tiny">Входи на сайт: акаунт, час і пристрій.</p><div id="visitsList"></div></div></div>
 <script type="module">
-import{initializeApp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';import{getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';import{getFirestore,collection,addDoc,doc,setDoc,updateDoc,deleteDoc,deleteField,onSnapshot,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';import{getStorage,ref as sref,uploadBytesResumable,getDownloadURL}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js';
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';import{getFirestore,collection,addDoc,doc,setDoc,updateDoc,deleteDoc,deleteField,onSnapshot,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';import{getStorage,ref as sref,uploadBytesResumable,getDownloadURL}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js';
 const firebaseConfig={apiKey:'AIzaSyDUBh1vJcb9vd3og8wP8uirFig4Qz_-z50',authDomain:'nash-chas-ed25f.firebaseapp.com',projectId:'nash-chas-ed25f',storageBucket:'nash-chas-ed25f.firebasestorage.app',messagingSenderId:'118702039529',appId:'1:118702039529:web:24c84f319f56d4bb73ab78'};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app),$=id=>document.getElementById(id),now=()=>Date.now();
-const INVITE_CODE='nashchas2026'; /* змініть у файлі на свій код запрошення для реєстрації */
 function uploadToStorage(file,path,onProgress){return new Promise((resolve,reject)=>{
 const r=sref(storage,path),task=uploadBytesResumable(r,file);
 const to=setTimeout(()=>{task.cancel();reject(Object.assign(Error('timeout'),{code:'timeout'}))},45000);
@@ -200,14 +216,7 @@ const getMs=i=>'dateMs'in i?(Number(i.dateMs)||0):(i.date?(new Date(i.date).getT
 let rndId=null,lastAll=[];
 /* Логін без пошти: Firebase вимагає email, тому до логіна дописується службовий домен */
 const DOM='@nashchas.invalid',toEmail=v=>{v=v.trim().toLowerCase();return v.includes('@')?v:v+DOM},shortName=e=>(e||'?').replace(DOM,'');
-let authMode='login';
-$('toggleAuth').onclick=e=>{e.preventDefault();authMode=authMode==='login'?'signup':'login';$('inviteField').classList.toggle('hidden',authMode==='login');$('loginSubmit').textContent=authMode==='login'?'Увійти ❤️':'Зареєструватися ❤️';$('toggleAuth').textContent=authMode==='login'?'Немає акаунту? Зареєструватися':'Вже є акаунт? Увійти';$('loginError').textContent=''};
-$('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';const em=toEmail($('email').value),pw=$('password').value;
-try{if(authMode==='signup'){if($('invite').value.trim()!==INVITE_CODE){$('loginError').textContent='Неправильний код запрошення.';return}
-const cred=await createUserWithEmailAndPassword(auth,em,pw);$('password').value='';
-toast('Акаунт створено ❤️');alert('Акаунт створено!\n\nЩоб цей акаунт отримав доступ до спогадів, власник сайту має додати цей ідентифікатор у правила Firestore та Storage:\n\n'+cred.user.uid+'\n\nДо того часу вхід буде працювати, але дані не завантажаться.')}
-else{await signInWithEmailAndPassword(auth,em,pw);$('password').value=''}}
-catch(err){$('loginError').textContent=err.code==='auth/email-already-in-use'?'Такий логін вже зареєстровано.':err.code==='auth/weak-password'?'Пароль закороткий (мінімум 6 символів).':err.code==='auth/invalid-credential'?'Неправильний логін або пароль.':'Не вдалося виконати дію. Перевірте дані та інтернет.'}};
+$('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';try{await signInWithEmailAndPassword(auth,toEmail($('email').value),$('password').value);$('password').value=''}catch(err){$('loginError').textContent=err.code==='auth/invalid-credential'?'Неправильний логін або пароль.':'Не вдалося увійти. Перевірте дані та інтернет.'}};
 $('logoutBtn').onclick=()=>signOut(auth);
 if(remindOn)$('remindBtn').classList.add('on');
 onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').classList.toggle('hidden',!!user);$('appPanel').classList.toggle('hidden',!user);$('userLine').textContent=user?'Ви увійшли разом ♡':'';if(user){logVisit(user);for(const key of Object.keys(data)){unsubs.push(onSnapshot(collection(db,key),snap=>{data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));renderAll()},err=>{console.error(err);toast('Не вдалося завантажити '+key+'. Перевіримо правила доступу.')}))}}else{for(const k in data)data[k]=[];renderAll()}});
@@ -277,7 +286,7 @@ const td=new Date(t),ot=mem.filter(i=>{const d=new Date(i.ms);return d.getMonth(
 $('todaySec').classList.toggle('hidden',!ot.length);$('todayList').innerHTML=ot.map(i=>{const n=td.getFullYear()-new Date(i.ms).getFullYear();return memCard(i,n+' '+yr(n)+' тому')}).join('');
 if(!mem.find(i=>i.id===rndId))rndId=mem.length?mem[Math.floor(Math.random()*mem.length)].id:null;
 $('randomMem').innerHTML=rndId?memCard(mem.find(i=>i.id===rndId)):empty('Додайте перший спогад ♡');
-lastAll=all;renderPlaylist();renderWish();renderMovies();renderMood();checkReminders(all);
+lastAll=all;renderPlaylist();renderWish();renderMovies();renderMood();renderActivity(all);checkReminders(all);
 $('momentsList').innerHTML=mem.map(i=>memCard(i)).join('')||empty('Тут будуть ваші спільні спогади');
 $('dreamsList').innerHTML=wish.map(wishCard).join('')||empty('Запишіть мрію чи ідею, навіть без дати');
 $('lettersList').innerHTML=data.letters.slice().sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(letterCard).join('')||empty('Збережіть перший лист одне одному');
@@ -362,6 +371,41 @@ $('moodList').innerHTML=list.map(x=>`<article class="moodrow"><span class="me">$
 $('moodForm').onsubmit=async e=>{e.preventDefault();$('moodError').textContent='';if(!pickedMood){$('moodError').textContent='Оберіть смайл настрою.';return}
 const uid=auth.currentUser?.uid,id=uid+'_'+todayKey();
 try{await setDoc(doc(db,'moods',id),{uid,who:auth.currentUser?.email||'',dateKey:todayKey(),mood:pickedMood,text:$('moodText').value.trim(),updatedAt:serverTimestamp()});toast('Збережено ❤️')}catch(err){console.error(err);$('moodError').textContent='Не вдалося зберегти.'}};
+
+
+/* ---- Привітання: різне для кожного дня місяця, своє для ранку/дня/вечора/ночі ---- */
+const GREET={
+morning:['Доброго ранку ♡','Новий день — ще одна наша сторінка','Прокинулись — і знову разом ♡','Ранок почався з думки про тебе','Світанок, кава і ти ♡','Кожен ранок із тобою — подарунок','Доброго ранку, моя людино','Хай цей день буде лагідним до нас'],
+day:['Кожна мить — наша.','Хорошого дня, де б ти не був(ла)','День у розпалі — а ти все одно поруч думками','Невелика пауза, щоб згадати нас ♡','Світ великий, а найкраще в ньому — ти','Дня, сповненого дрібних радощів','Між справами — думка про тебе'],
+evening:['Вечір, тиша і спогади ♡','День закінчується, а ми — тривають','Вечір — час для нас двох','Хорошого вечора, моя половинко','Запали свічку спогадів разом зі мною','Ще один вечір, який хочеться згадувати'],
+night:['Кожна мить — наша.','Ніч тиха, а серце тепле ♡','Хай сняться добрі сни','Пізня ніч — улюблений час для щирості','Спокійної ночі, моя людино','Зірки вже на небі, а ти — в думках']
+};
+function setGreeting(){const h=new Date().getHours(),d=new Date().getDate();
+const period=h<6?'night':h<11?'morning':h<17?'day':h<22?'evening':'night';
+const list=GREET[period];$('greeting').textContent=list[d%list.length]}
+setGreeting();
+
+/* ---- Швидкий доступ ---- */
+const QUICK=[{k:'moment',icon:'📸',label:'Спогад'},{k:'dream',icon:'✨',label:'Мрія'},{k:'letter',icon:'💌',label:'Лист'},{k:'track',icon:'🎵',label:'Трек'},{k:'wish',icon:'🎁',label:'Бажання'},{k:'movie',icon:'🎬',label:'Фільм'}];
+$('quickAdd').innerHTML=QUICK.map(q=>`<button class="qa qa-${q.k}" onclick="quickAdd('${q.k}')"><span class="qaIcon">${q.icon}</span><span class="qaLabel">${q.label}</span></button>`).join('');
+window.quickAdd=k=>{
+if(k==='moment')return openModal('item',null,'moments',true);
+if(k==='dream')return openModal('item',null,'moments',false);
+if(k==='letter')return openModal('letter');
+if(k==='track'){showView('music');setTimeout(()=>$('trackUrl')?.focus(),250);return}
+if(k==='wish'){showView('wishlist');setTimeout(()=>$('wishTitle')?.focus(),250);return}
+if(k==='movie'){showView('movies');setTimeout(()=>$('movieTitle')?.focus(),250);return}
+};
+
+/* ---- Стрічка останньої активності ---- */
+function renderActivity(all){const uid=auth.currentUser?.uid,items=[];
+const sec=x=>x.createdAt?.seconds||0;
+all.forEach(i=>items.push({ms:sec(i),icon:i.ms&&i.ms<=now()?'📸':'✨',text:(i.ms&&i.ms<=now()?'Новий спогад: ':'Нова мрія: ')+i.title}));
+data.letters.forEach(l=>items.push({ms:sec(l),icon:'💌',text:'Новий лист для '+(l.to||'нас обох')}));
+data.wishlist.forEach(w=>items.push({ms:sec(w),icon:'🎁',text:(w.owner===uid?'Ви додали бажання':'Партнер додав(ла) бажання')}));
+data.movies.forEach(m=>items.push({ms:sec(m),icon:'🎬',text:'Додано фільм: '+m.title}));
+data.playlist.forEach(t=>items.push({ms:sec(t),icon:'🎵',text:'Новий трек: '+(t.title||'YouTube')}));
+$('activityList').innerHTML=items.filter(x=>x.ms).sort((a,b)=>b.ms-a.ms).slice(0,6).map(x=>`<div class="arow"><span class="aicon">${x.icon}</span><span>${esc(x.text)}</span></div>`).join('')||empty('Тут з’являтиметься все нове, що ви додасте ♡')}
 
 function empty(t){return `<div class="empty"><b>♡</b>${t}</div>`}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
