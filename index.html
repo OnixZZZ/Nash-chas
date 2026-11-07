@@ -121,6 +121,7 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .track.on{border-color:var(--wine);background:var(--rose)}
 .rec{display:flex;align-items:center;gap:10px}
 .rec #recBtn{min-width:150px}
+.rec #recBtn.retry{background:#fff1f1;color:#a8475a;border-color:#eccaca}
 .pv audio{width:100%;margin-top:8px}
 .whoTabs{display:flex;gap:8px;margin-bottom:14px}
 .wtab{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:8px 18px;font-weight:700;color:var(--muted)}
@@ -176,25 +177,35 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 <div id="lightbox" class="modalback hidden"><img id="lbImg" alt=""><video id="lbVid" class="hidden" controls autoplay></video><button id="lbDel" class="btn danger small hidden">Видалити фото</button></div>
 <div id="visitsBack" class="modalback hidden"><div class="modal"><div class="modalhead"><h2>Історія відвідувань</h2><button id="closeVisits" class="btn light small">Закрити</button></div><p class="muted tiny">Входи на сайт: акаунт, час і пристрій.</p><div id="visitsList"></div></div></div>
 <script type="module">
-import{initializeApp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';import{getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';import{getFirestore,collection,addDoc,doc,setDoc,updateDoc,deleteDoc,deleteField,onSnapshot,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';import{getStorage,ref as sref,uploadBytes,getDownloadURL}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js';
+import{initializeApp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';import{getAuth,signInWithEmailAndPassword,createUserWithEmailAndPassword,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';import{getFirestore,collection,addDoc,doc,setDoc,updateDoc,deleteDoc,deleteField,onSnapshot,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';import{getStorage,ref as sref,uploadBytesResumable,getDownloadURL}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-storage.js';
 const firebaseConfig={apiKey:'AIzaSyDUBh1vJcb9vd3og8wP8uirFig4Qz_-z50',authDomain:'nash-chas-ed25f.firebaseapp.com',projectId:'nash-chas-ed25f',storageBucket:'nash-chas-ed25f.firebasestorage.app',messagingSenderId:'118702039529',appId:'1:118702039529:web:24c84f319f56d4bb73ab78'};
 const app=initializeApp(firebaseConfig),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app),$=id=>document.getElementById(id),now=()=>Date.now();
 const INVITE_CODE='nashchas2026'; /* змініть у файлі на свій код запрошення для реєстрації */
-async function uploadVideo(file){if(file.size>60*1024*1024)throw Error('toobig');const path='media/'+(auth.currentUser?.uid||'u')+'/'+Date.now()+'_'+file.name.replace(/[^\w.-]/g,'_'),r=sref(storage,path);await uploadBytes(r,file);return getDownloadURL(r)}
+function uploadToStorage(file,path,onProgress){return new Promise((resolve,reject)=>{
+const r=sref(storage,path),task=uploadBytesResumable(r,file);
+const to=setTimeout(()=>{task.cancel();reject(Object.assign(Error('timeout'),{code:'timeout'}))},45000);
+task.on('state_changed',snap=>{clearTimeout(to);onProgress?.(Math.round(100*snap.bytesTransferred/(snap.totalBytes||1)))},
+err=>{clearTimeout(to);reject(err)},
+async()=>{clearTimeout(to);try{resolve(await getDownloadURL(task.snapshot.ref))}catch(e){reject(e)}})
+})}
+async function uploadVideo(file,onProgress){if(file.size>60*1024*1024)throw Error('toobig');const path='media/'+(auth.currentUser?.uid||'u')+'/'+Date.now()+'_'+file.name.replace(/[^\w.-]/g,'_');return uploadToStorage(file,path,onProgress)}
 let data={moments:[],timers:[],dreams:[],letters:[],playlist:[],wishlist:[],movies:[],moods:[]},unsubs=[],edit=null,photoData='',videoData='',srcImg=null,queue=[],vqueue=[],focusY=50,adj={b:100,c:100,s:100,r:0};
 let whoFilter='mine';
 let ytPlayer=null,ytReady=false,curIdx=-1,remindOn=(localStorage.getItem('remindOn')==='1'),swReg=null;
 let audioData='',mediaRec=null,recChunks=[],recording=false,recStart=0,recTimer=null;
-async function uploadAudio(blob){const path='media/'+(auth.currentUser?.uid||'u')+'/'+Date.now()+'_voice.webm',r=sref(storage,path);await uploadBytes(r,blob);return getDownloadURL(r)}
+async function uploadAudio(blob,onProgress){const path='media/'+(auth.currentUser?.uid||'u')+'/'+Date.now()+'_voice.webm';return uploadToStorage(blob,path,onProgress)}
 async function startRec(){try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});
 const mime=['audio/webm;codecs=opus','audio/ogg;codecs=opus','audio/webm'].find(t=>MediaRecorder.isTypeSupported?.(t));
 mediaRec=new MediaRecorder(stream,{mimeType:mime,audioBitsPerSecond:32000});recChunks=[];mediaRec.ondataavailable=e=>recChunks.push(e.data);
-mediaRec.onstop=async()=>{stream.getTracks().forEach(t=>t.stop());const blob=new Blob(recChunks,{type:mediaRec.mimeType||'audio/webm'});$('recBtn').textContent='⏳ Завантаження…';$('recBtn').disabled=true;
-try{audioData=await uploadAudio(blob);$('audioPv').innerHTML=`<audio src="${attr(audioData)}" controls preload="metadata"></audio>`;toast('Голосове додано ❤️')}catch(err){console.error(err);toast('Не вдалося завантажити голосове')}
-$('recBtn').disabled=false;$('recBtn').textContent='🎙 Почати запис'};
+mediaRec.onstop=async()=>{stream.getTracks().forEach(t=>t.stop());lastVoiceBlob=new Blob(recChunks,{type:mediaRec.mimeType||'audio/webm'});await uploadVoice(lastVoiceBlob)};
 mediaRec.start();recording=true;recStart=now();$('recBtn').textContent='⏹ Зупинити';recTimer=setInterval(()=>{const s=Math.floor((now()-recStart)/1000);$('recTime').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')},250)}
 catch(err){console.error(err);toast('Немає доступу до мікрофона')}}
 function stopRec(){if(mediaRec&&recording){mediaRec.stop();recording=false;clearInterval(recTimer);$('recTime').textContent=''}}
+let lastVoiceBlob=null;
+async function uploadVoice(blob){const rb=$('recBtn');if(!rb)return;rb.disabled=true;rb.classList.remove('retry');rb.textContent='⏳ 0%';
+try{audioData=await uploadAudio(blob,p=>{rb.textContent='⏳ '+p+'%'});$('audioPv').innerHTML=`<audio src="${attr(audioData)}" controls preload="metadata"></audio>`;toast('Голосове додано ❤️');rb.disabled=false;rb.textContent='🎙 Почати запис'}
+catch(err){console.error(err);rb.disabled=false;rb.classList.add('retry');rb.textContent='🔁 Спробувати ще раз';
+toast(err?.code==='timeout'?'Завантаження зависло. Перевірте інтернет і натисніть «Спробувати ще раз».':'Не вдалося завантажити. Перевірте правила Storage та натисніть «Спробувати ще раз».')}}
 const isStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').then(r=>swReg=r).catch(()=>{});
@@ -249,7 +260,7 @@ if(kind==='item'){const ms=item?item.ms:isMem?now():0,mm=item?!!(ms&&ms<=now()):
 else if(kind==='photo')h=`<div class="field"><label>Фото та відео (можна вибрати кілька, відео до 60 МБ)</label><input id="uploadPhoto" type="file" accept="image/*,video/*" multiple><div id="pv" class="pv"></div>${ED}</div>`;
 else h=`<div class="field"><label>Заголовок</label><input name="title" required maxlength="90" value="${attr(item?.title||'')}" placeholder="Наприклад: Відкрий, коли сумуєш"></div><div class="field"><label>Для кого</label><select name="to"><option value="Марії" ${item?.to==='Марії'?'selected':''}>Марії</option><option value="Саші" ${item?.to==='Саші'?'selected':''}>Саші</option><option value="Нам обом" ${item?.to==='Нам обом'?'selected':''}>Нам обом</option></select></div><div class="field"><label>Текст листа</label><textarea name="text" placeholder="Напиши те, що хочеш зберегти...">${esc(item?.text||'')}</textarea><small class="muted">Текст можна лишити порожнім, якщо запишете голосове.</small></div><div class="field"><label>Голосове повідомлення (необов'язково)</label><div class="rec"><button type="button" id="recBtn" class="btn light small">🎙 Почати запис</button><span id="recTime" class="tiny muted"></span></div><div id="audioPv" class="pv">${item?.audio?`<audio src="${attr(item.audio)}" controls preload="none"></audio>`:''}</div></div><div class="field"><label>Запечатати до дати (необов’язково)</label><input name="unlock" type="date" value="${attr(item?.unlock||'')}"></div>`;
 $('modalFields').innerHTML=h;syncEd();setPv();$('modalError').textContent='';$('modalBack').classList.remove('hidden');
-if(kind==='letter'){audioData=item?.audio||'';const rb=$('recBtn');if(rb)rb.onclick=()=>recording?stopRec():startRec()}
+if(kind==='letter'){audioData=item?.audio||'';lastVoiceBlob=null;const rb=$('recBtn');if(rb){rb.classList.remove('retry');rb.onclick=()=>rb.classList.contains('retry')?uploadVoice(lastVoiceBlob):recording?stopRec():startRec()}}
 const file=$('uploadPhoto');if(file){file.onchange=async()=>{const fs=[...file.files];if(!fs.length)return;const imgs=fs.filter(f=>f.type.startsWith('image/')),vids=fs.filter(f=>f.type.startsWith('video/'));queue=[];vqueue=[];
 try{
 for(const f of vids){if(f.size>60*1024*1024){toast('Відео '+f.name+' більше 60 МБ, пропущено');continue}toast('Завантажуємо відео '+f.name+'…');vqueue.push(await uploadVideo(f))}
