@@ -169,13 +169,30 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .chatHead b{font:700 15px var(--sans)}
 .chatHeadBtns{display:flex;gap:6px}
 #chatBell.on{background:var(--wine);color:#fff;border-color:var(--wine)}
-.chatMsgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
-.cmsg{max-width:78%;padding:9px 13px;border-radius:16px;font-size:14px;line-height:1.4;white-space:pre-wrap;word-break:break-word}
-.cmsg.me{align-self:flex-end;background:var(--wine);color:#fff;border-bottom-right-radius:4px}
-.cmsg.them{align-self:flex-start;background:var(--rose);color:var(--ink);border-bottom-left-radius:4px}
-.chatForm{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
-.chatForm input{flex:1;border:1.5px solid var(--line);border-radius:99px;padding:10px 16px}
-.chatForm button{border-radius:50%;width:42px;height:42px;padding:0;display:flex;align-items:center;justify-content:center;font-size:16px}
+.chatMsgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:3px}
+.cdate{align-self:center;margin:10px 0 6px;padding:3px 12px;background:var(--line);color:var(--muted);font:600 11px var(--sans);border-radius:99px}
+.cmsgwrap{max-width:82%;display:flex;flex-direction:column;gap:3px;margin:3px 0}
+.cmsgwrap.me{align-self:flex-end;align-items:flex-end}
+.cmsgwrap.them{align-self:flex-start;align-items:flex-start}
+.cmsgwrap{position:relative}
+.cbubble{padding:8px 12px;border-radius:16px;font-size:14px;line-height:1.4;word-break:break-word;display:flex;flex-direction:column;gap:3px}
+.cmsgwrap.me .cbubble{background:var(--wine);color:#fff;border-bottom-right-radius:4px}
+.cmsgwrap.them .cbubble{background:var(--rose);color:var(--ink);border-bottom-left-radius:4px}
+.ctext{white-space:pre-wrap}
+.ctime{align-self:flex-end;font-size:10px;opacity:.75}
+.cimg{max-width:100%;max-height:220px;border-radius:12px;cursor:pointer;display:block}
+.cactions{display:none;gap:4px;position:absolute;top:-26px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:2px;box-shadow:var(--shadow)}
+.cmsgwrap.me .cactions{right:0}.cmsgwrap.them .cactions{left:0}
+.cmsgwrap:hover .cactions,.cmsgwrap:focus-within .cactions,.cmsgwrap.show .cactions{display:flex}
+.cactions button{border:0;background:none;width:24px;height:24px;border-radius:50%;font-size:12px;cursor:pointer}
+.cactions button:hover{background:var(--rose)}
+.cheart{align-self:inherit;border:1px solid var(--line);background:#fff;border-radius:99px;padding:1px 9px;font-size:11px;margin-top:-1px}
+.cheart.mine{border-color:var(--wine);color:var(--wine)}
+.chatTyping{padding:0 16px 6px;font:italic 12px var(--sans);color:var(--muted)}
+.chatForm{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line);align-items:center}
+.chatForm input{flex:1;border:1.5px solid var(--line);border-radius:99px;padding:10px 16px;min-width:0}
+.chatForm button[type=submit]{border-radius:50%;width:42px;height:42px;padding:0;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none}
+#chatAttach{border-radius:50%;width:38px;height:38px;padding:0;font-size:15px;flex:none}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 </style>
@@ -238,7 +255,9 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 <div id="chatPanel" class="chatPanel hidden">
 <div class="chatHead"><b>💬 Переписка</b><div class="chatHeadBtns"><button id="chatBell" class="btn light small">🔔</button><button id="chatClose" class="btn light small">✕</button></div></div>
 <div id="chatMsgs" class="chatMsgs"></div>
-<form id="chatForm" class="chatForm"><input id="chatInput" type="text" placeholder="Напишіть щось тепле…" autocomplete="off" required><button class="btn small" type="submit">➤</button></form>
+<div id="chatTypingRow" class="chatTyping hidden"></div>
+<form id="chatForm" class="chatForm"><button type="button" id="chatAttach" class="btn light small">📎</button><input id="chatInput" type="text" placeholder="Напишіть щось тепле…" autocomplete="off"><button class="btn small" type="submit">➤</button></form>
+<input type="file" id="chatImgInput" accept="image/*" class="hidden">
 </div>
 <div id="visitsBack" class="modalback hidden"><div class="modal"><div class="modalhead"><h2>Історія відвідувань</h2><button id="closeVisits" class="btn light small">Закрити</button></div><p class="muted tiny">Входи на сайт: акаунт, час і пристрій.</p><div id="visitsList"></div></div></div>
 <script type="module">
@@ -257,7 +276,7 @@ xhr.ontimeout=()=>reject(Object.assign(Error('timeout'),{code:'timeout'}));
 xhr.send(fd)
 })}
 async function uploadVideo(file,onProgress){if(file.size>60*1024*1024)throw Error('toobig');return uploadToCloudinary(file,onProgress)}
-let data={moments:[],timers:[],dreams:[],letters:[],playlist:[],wishlist:[],movies:[],moods:[],presence:[],chat:[]},unsubs=[],edit=null,photoData='',videoData='',srcImg=null,queue=[],vqueue=[],focusY=50,adj={b:100,c:100,s:100,r:0};
+let data={moments:[],timers:[],dreams:[],letters:[],playlist:[],wishlist:[],movies:[],moods:[],presence:[],chat:[],chatReceipts:[],chatTyping:[]},unsubs=[],edit=null,photoData='',videoData='',srcImg=null,queue=[],vqueue=[],focusY=50,adj={b:100,c:100,s:100,r:0};
 let chatOpen=false,chatLastMsgId=null,chatNotify=(localStorage.getItem('chatNotify')==='1');
 let presenceTimer=null,prevOnline={},presenceNotify=(localStorage.getItem('presenceNotify')==='1');
 let whoFilter='mine';
@@ -498,24 +517,53 @@ prevOnline[p.id]=online;
 return `<div class="presRow"><span class="dot${online?' on':''}"></span>${online?`<b>${esc(presenceName(p.email))} зараз тут ♡</b>`:`${esc(presenceName(p.email))} — востаннє ${ms?dateFmt(ms):'давно'}`}</div>`}).join('')||''}
 
 
-/* ---- Чат ---- */
-function chatLastRead(){return +(localStorage.getItem('chatLastRead_'+(auth.currentUser?.uid||''))||0)}
-function setChatRead(){localStorage.setItem('chatLastRead_'+(auth.currentUser?.uid||''),String(now()))}
-$('chatBubble').onclick=()=>{chatOpen=!chatOpen;$('chatPanel').classList.toggle('hidden',!chatOpen);if(chatOpen){setChatRead();renderChatBadge();$('chatMsgs').scrollTop=$('chatMsgs').scrollHeight;setTimeout(()=>$('chatInput').focus(),200)}};
+/* ---- Чат (у стилі месенджера: статус прочитання, «друкує…», редагування, видалення, фото, реакції) ---- */
+const csec=x=>(x.createdAt?.seconds||0)*1000;
+function touchChatRead(){const u=auth.currentUser;if(!u)return;setDoc(doc(db,'chatReceipts',u.uid),{lastReadAt:serverTimestamp()}).catch(()=>{})}
+$('chatBubble').onclick=()=>{chatOpen=!chatOpen;$('chatPanel').classList.toggle('hidden',!chatOpen);if(chatOpen){touchChatRead();renderChatBadge();$('chatMsgs').scrollTop=$('chatMsgs').scrollHeight;setTimeout(()=>$('chatInput').focus(),200)}};
 $('chatClose').onclick=()=>{chatOpen=false;$('chatPanel').classList.add('hidden')};
 $('chatBell').onclick=async()=>{if(!await ensureNotifyPermission())return;chatNotify=!chatNotify;localStorage.setItem('chatNotify',chatNotify?'1':'0');$('chatBell').classList.toggle('on',chatNotify);toast(chatNotify?'Сповіщення про повідомлення увімкнено ❤️':'Сповіщення про повідомлення вимкнено')};
 if(chatNotify)$('chatBell').classList.add('on');
-$('chatForm').onsubmit=async e=>{e.preventDefault();const text=$('chatInput').value.trim();if(!text)return;$('chatInput').value='';
+function stopTyping(){clearTimeout(window.typingTimer);const u=auth.currentUser;if(u)setDoc(doc(db,'chatTyping',u.uid),{typing:false,at:serverTimestamp()}).catch(()=>{})}
+$('chatInput').oninput=()=>{const u=auth.currentUser;if(!u)return;setDoc(doc(db,'chatTyping',u.uid),{typing:true,at:serverTimestamp()}).catch(()=>{});clearTimeout(window.typingTimer);window.typingTimer=setTimeout(stopTyping,2500)};
+$('chatForm').onsubmit=async e=>{e.preventDefault();const text=$('chatInput').value.trim();if(!text)return;$('chatInput').value='';stopTyping();
 try{await addDoc(collection(db,'chat'),{text,uid:auth.currentUser.uid,email:auth.currentUser.email||'',createdAt:serverTimestamp()})}catch(err){console.error(err);toast('Не вдалося надіслати повідомлення')}};
-function renderChatBadge(){const uid=auth.currentUser?.uid,lr=chatLastRead(),sec=x=>(x.createdAt?.seconds||0)*1000;
-const unread=data.chat.filter(m=>m.uid!==uid&&sec(m)>lr&&sec(m)>0).length;
+$('chatAttach').onclick=()=>$('chatImgInput').click();
+$('chatImgInput').onchange=async()=>{const f=$('chatImgInput').files?.[0];$('chatImgInput').value='';if(!f)return;
+const text=$('chatInput').value.trim();$('chatInput').value='';stopTyping();toast('Надсилаємо фото…');
+try{const url=await uploadToCloudinary(f);await addDoc(collection(db,'chat'),{text,photo:url,uid:auth.currentUser.uid,email:auth.currentUser.email||'',createdAt:serverTimestamp()})}
+catch(err){console.error(err);toast('Не вдалося надіслати фото')}};
+window.editMsg=async id=>{const m=data.chat.find(x=>x.id===id);if(!m)return;const val=prompt('Редагувати повідомлення:',m.text||'');if(val===null)return;const text=val.trim();if(!text)return;
+try{await updateDoc(doc(db,'chat',id),{text,edited:true,updatedAt:serverTimestamp()})}catch(e){toast('Не вдалося зберегти зміни')}};
+window.deleteMsg=async id=>{if(!confirm('Видалити повідомлення?'))return;try{await deleteDoc(doc(db,'chat',id))}catch(e){toast('Не вдалося видалити')}};
+window.toggleHeart=async id=>{const uid=auth.currentUser?.uid,m=data.chat.find(x=>x.id===id);if(!uid||!m)return;const on=!(m.hearts&&m.hearts[uid]);
+try{await updateDoc(doc(db,'chat',id),{['hearts.'+uid]:on?true:deleteField()})}catch(e){toast('Не вдалося оновити')}};
+function chatDateLabel(ms){const d=new Date(ms),t=new Date();const sameDay=x=>x.toDateString()===d.toDateString();
+if(sameDay(t))return 'Сьогодні';const y=new Date(t);y.setDate(y.getDate()-1);if(sameDay(y))return 'Вчора';
+return new Intl.DateTimeFormat('uk-UA',{day:'numeric',month:'long'}).format(d)}
+function renderChatBadge(){const uid=auth.currentUser?.uid,my=data.chatReceipts.find(r=>r.id===uid),lr=(my?.lastReadAt?.seconds||0)*1000;
+const unread=data.chat.filter(m=>m.uid!==uid&&csec(m)>lr&&csec(m)>0).length;
 $('chatBadge').classList.toggle('hidden',!unread||chatOpen);$('chatBadge').textContent=unread>9?'9+':unread}
-function renderChat(){const uid=auth.currentUser?.uid,list=data.chat.slice().sort((a,b)=>(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0));
-$('chatMsgs').innerHTML=list.map(m=>`<div class="cmsg ${m.uid===uid?'me':'them'}">${esc(m.text)}</div>`).join('')||`<p class="muted tiny" style="padding:20px;text-align:center">Напишіть перше повідомлення ♡</p>`;
+function renderChat(){const uid=auth.currentUser?.uid,list=data.chat.slice().sort((a,b)=>csec(a)-csec(b));
+const theirReceipt=data.chatReceipts.find(r=>r.id&&r.id!==uid),theirRead=(theirReceipt?.lastReadAt?.seconds||0)*1000;
+let html='',lastDay='';
+list.forEach(m=>{const ms=csec(m),mine=m.uid===uid;
+if(ms){const day=new Date(ms).toDateString();if(day!==lastDay){html+=`<div class="cdate">${chatDateLabel(ms)}</div>`;lastDay=day}}
+const time=ms?new Intl.DateTimeFormat('uk-UA',{hour:'2-digit',minute:'2-digit'}).format(new Date(ms)):'';
+const hearts=m.hearts||{},hc=Object.values(hearts).filter(Boolean).length,myHeart=uid&&!!hearts[uid];
+const seen=mine&&theirRead>=ms&&ms>0;
+html+=`<div class="cmsgwrap ${mine?'me':'them'}" onclick="this.classList.toggle('show')">
+<div class="cbubble">${m.photo?`<img class="cimg" src="${attr(m.photo)}" alt="" loading="lazy" onclick="window.open('${attr(m.photo)}','_blank')">`:''}${m.text?`<span class="ctext">${esc(m.text)}</span>`:''}<span class="ctime">${m.edited?'ред. · ':''}${time}${mine?(seen?' ✓✓':' ✓'):''}</span></div>
+${hc?`<button class="cheart${myHeart?' mine':''}" onclick="toggleHeart('${m.id}')">❤️ ${hc}</button>`:''}
+<div class="cactions"><button onclick="toggleHeart('${m.id}')" title="Реакція">❤️</button>${mine?`<button onclick="editMsg('${m.id}')" title="Редагувати">✎</button><button onclick="deleteMsg('${m.id}')" title="Видалити">🗑</button>`:''}</div>
+</div>`});
+$('chatMsgs').innerHTML=html||`<p class="muted tiny" style="padding:20px;text-align:center">Напишіть перше повідомлення ♡</p>`;
+const theirTyping=data.chatTyping.find(t=>t.id&&t.id!==uid),typingAt=(theirTyping?.at?.seconds||0)*1000;
+const isTyping=theirTyping?.typing&&now()-typingAt<6000;
+$('chatTypingRow').classList.toggle('hidden',!isTyping);if(isTyping)$('chatTypingRow').textContent=presenceName(theirTyping.email)+' друкує…';
 if(chatOpen)$('chatMsgs').scrollTop=$('chatMsgs').scrollHeight;
 const newest=list[list.length-1];
-if(newest&&newest.id!==chatLastMsgId){if(chatLastMsgId!==null&&newest.uid!==uid&&chatNotify)notify('Наш час ♡','💬 '+(newest.text||'').slice(0,80));chatLastMsgId=newest.id}
-if(chatOpen)setChatRead();
+if(newest&&newest.id!==chatLastMsgId){if(chatLastMsgId!==null&&newest.uid!==uid&&chatNotify)notify('Наш час ♡','💬 '+(newest.photo&&!newest.text?'Фото':(newest.text||'')).slice(0,80));chatLastMsgId=newest.id;if(chatOpen)touchChatRead()}
 renderChatBadge()}
 
 function empty(t){return `<div class="empty"><b>♡</b>${t}</div>`}
