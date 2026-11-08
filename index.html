@@ -112,6 +112,7 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 #randomMem{grid-template-columns:minmax(0,520px)}#todayList{grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr))}
 .vrow{display:grid;gap:2px;padding:10px 0;border-bottom:1px solid var(--line)}.vrow span{font-size:13px;color:var(--muted)}
 #secret{cursor:default}
+.cardvid{width:100%;max-height:260px;display:block;border-radius:16px;margin-top:10px;background:#000}
 .zoom.vid,.zoom.hasvid{background:#000}.zoom video{width:100%;height:100%;object-fit:cover;display:block}
 .zoom .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:30px;color:#fff;text-shadow:0 2px 6px #0008;pointer-events:none}
 #lbVid{max-width:100%;max-height:92vh;border-radius:14px}
@@ -327,9 +328,11 @@ const direct=data.timers.filter(x=>x.gallery&&(x.photo||x.video)).map(x=>({...x,
 $('momentsCount').textContent=mem.length;$('plansCount').textContent=wish.filter(i=>!i.done).length;$('lettersCount').textContent=data.letters.length}
 
 const zimg=i=>i.video&&!i.photo?`<div class="zoom vid" onclick="showPhoto('${i.col}','${i.id}')"><video src="${attr(i.video)}" muted playsinline preload="metadata"></video><span class="play">▶</span></div>`:`<div class="zoom${i.video?' hasvid':''}" onclick="showPhoto('${i.col}','${i.id}')"><img src="${attr(i.photo)}" alt="${attr(i.title||'')}" loading="lazy" style="object-position:50% ${i.focus??50}%">${i.video?'<span class="play">▶</span>':''}</div>`;
+/* Коли в записі є і фото, і відео — показуємо обидва окремо, а не тільки одне */
+function mediaBlock(i){if(i.photo&&i.video)return `<div class="zoom" onclick="showPhoto('${i.col}','${i.id}')"><img src="${attr(i.photo)}" alt="${attr(i.title||'')}" loading="lazy" style="object-position:50% ${i.focus??50}%"></div><video class="cardvid" src="${attr(i.video)}" controls preload="none"></video>`;return zimg(i)}
 const act=i=>`<div class="itemactions"><button class="btn light small" onclick="editItem('${i.col}','${i.id}')">Змінити</button><button class="btn danger small" onclick="removeItem('${i.col}','${i.id}')">Видалити</button></div>`;
-function memCard(i,tag){return `<article class="mem">${i.photo||i.video?zimg(i):'<div class="ph">♡</div>'}<div class="body"><div class="date">${tag?`<b class="tag">${tag}</b> · `:''}${dateFmt(i.ms)}${i.place?' · '+esc(i.place):''}</div><h3>${esc(i.title)}</h3>${i.text?`<div class="desc">${esc(i.text)}</div>`:''}${react(i)}${act(i)}</div></article>`}
-function wishCard(i){return `<article class="wish${i.done?' done':''}"><input class="check" type="checkbox" ${i.done?'checked':''} onchange="toggleDone('${i.col}','${i.id}',this.checked)"><div class="wbody"><h3>${esc(i.title)}</h3>${i.ms||i.place?`<div class="date">${i.ms?dateFmt(i.ms):''}${i.ms&&i.place?' · ':''}${esc(i.place||'')}</div>`:''}${i.text?`<div class="desc">${esc(i.text)}</div>`:''}${i.photo||i.video?zimg(i):''}${act(i)}</div></article>`}
+function memCard(i,tag){return `<article class="mem">${i.photo||i.video?mediaBlock(i):'<div class="ph">♡</div>'}<div class="body"><div class="date">${tag?`<b class="tag">${tag}</b> · `:''}${dateFmt(i.ms)}${i.place?' · '+esc(i.place):''}</div><h3>${esc(i.title)}</h3>${i.text?`<div class="desc">${esc(i.text)}</div>`:''}${react(i)}${act(i)}</div></article>`}
+function wishCard(i){return `<article class="wish${i.done?' done':''}"><input class="check" type="checkbox" ${i.done?'checked':''} onchange="toggleDone('${i.col}','${i.id}',this.checked)"><div class="wbody"><h3>${esc(i.title)}</h3>${i.ms||i.place?`<div class="date">${i.ms?dateFmt(i.ms):''}${i.ms&&i.place?' · ':''}${esc(i.place||'')}</div>`:''}${i.text?`<div class="desc">${esc(i.text)}</div>`:''}${i.photo||i.video?mediaBlock(i):''}${act(i)}</div></article>`}
 
 setInterval(()=>{if(auth.currentUser)renderAll()},60000);
 
