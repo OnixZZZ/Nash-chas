@@ -102,6 +102,7 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
  .nav{padding:9px 2px 0;gap:6px}.nav button{padding:6px 13px;font-size:12px}
  .hero{padding:34px 14px 28px}.gallery{grid-template-columns:repeat(2,1fr)}.sectionhead h2{font-size:26px}
  .modalback{place-items:end center;padding:0}.modal{border-radius:26px 26px 0 0}#lightbox{place-items:center;padding:10px}
+ .chatBubble{right:14px;bottom:14px}.chatPanel{right:0;left:0;bottom:0;width:100%;max-width:100%;height:72vh;border-radius:22px 22px 0 0}
 }
 .react{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
 .rb{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:2px 12px;font-size:17px;line-height:1.6}
@@ -161,6 +162,20 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .dot{width:9px;height:9px;border-radius:50%;background:#c9c0c3;flex:none}
 .dot.on{background:#4caf7d;box-shadow:0 0 0 4px #4caf7d26}
 #presenceBtn.on{background:var(--wine);color:#fff;border-color:var(--wine)}
+.chatBubble{position:fixed;right:20px;bottom:20px;z-index:15;width:58px;height:58px;border-radius:50%;border:0;background:var(--wine);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 26px #6b2f4550;cursor:pointer}
+.chatBadge{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:99px;background:#ff5a6e;color:#fff;font:700 11px var(--sans);display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
+.chatPanel{position:fixed;right:20px;bottom:88px;z-index:16;width:340px;max-width:calc(100vw - 32px);height:min(460px,70vh);background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 20px 50px #0004;display:flex;flex-direction:column;overflow:hidden}
+.chatHead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--rose)}
+.chatHead b{font:700 15px var(--sans)}
+.chatHeadBtns{display:flex;gap:6px}
+#chatBell.on{background:var(--wine);color:#fff;border-color:var(--wine)}
+.chatMsgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:8px}
+.cmsg{max-width:78%;padding:9px 13px;border-radius:16px;font-size:14px;line-height:1.4;white-space:pre-wrap;word-break:break-word}
+.cmsg.me{align-self:flex-end;background:var(--wine);color:#fff;border-bottom-right-radius:4px}
+.cmsg.them{align-self:flex-start;background:var(--rose);color:var(--ink);border-bottom-left-radius:4px}
+.chatForm{display:flex;gap:8px;padding:12px;border-top:1px solid var(--line)}
+.chatForm input{flex:1;border:1.5px solid var(--line);border-radius:99px;padding:10px 16px}
+.chatForm button{border-radius:50%;width:42px;height:42px;padding:0;display:flex;align-items:center;justify-content:center;font-size:16px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 </style>
@@ -219,6 +234,12 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 </section><div class="footer">Створено з любов'ю для вас двох · Наш час <span id="secret">♡</span></div></main><div id="toast" class="toast hidden"></div>
 <div id="modalBack" class="modalback hidden"><div class="modal"><div class="modalhead"><h2 id="modalTitle">Новий спогад</h2><button id="closeModal" class="btn light small">Закрити</button></div><form id="itemForm"><div id="modalFields"></div><p id="modalError" class="error"></p><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" type="submit">Зберегти</button><button id="cancelModal" class="btn light" type="button">Скасувати</button></div></form></div></div>
 <div id="lightbox" class="modalback hidden"><img id="lbImg" alt=""><video id="lbVid" class="hidden" controls autoplay></video><button id="lbDel" class="btn danger small hidden">Видалити фото</button></div>
+<button id="chatBubble" class="chatBubble hidden"><span>💬</span><span id="chatBadge" class="chatBadge hidden">0</span></button>
+<div id="chatPanel" class="chatPanel hidden">
+<div class="chatHead"><b>💬 Переписка</b><div class="chatHeadBtns"><button id="chatBell" class="btn light small">🔔</button><button id="chatClose" class="btn light small">✕</button></div></div>
+<div id="chatMsgs" class="chatMsgs"></div>
+<form id="chatForm" class="chatForm"><input id="chatInput" type="text" placeholder="Напишіть щось тепле…" autocomplete="off" required><button class="btn small" type="submit">➤</button></form>
+</div>
 <div id="visitsBack" class="modalback hidden"><div class="modal"><div class="modalhead"><h2>Історія відвідувань</h2><button id="closeVisits" class="btn light small">Закрити</button></div><p class="muted tiny">Входи на сайт: акаунт, час і пристрій.</p><div id="visitsList"></div></div></div>
 <script type="module">
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,signOut}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-auth.js';import{getFirestore,collection,addDoc,doc,setDoc,updateDoc,deleteDoc,deleteField,onSnapshot,serverTimestamp}from'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
@@ -236,7 +257,8 @@ xhr.ontimeout=()=>reject(Object.assign(Error('timeout'),{code:'timeout'}));
 xhr.send(fd)
 })}
 async function uploadVideo(file,onProgress){if(file.size>60*1024*1024)throw Error('toobig');return uploadToCloudinary(file,onProgress)}
-let data={moments:[],timers:[],dreams:[],letters:[],playlist:[],wishlist:[],movies:[],moods:[],presence:[]},unsubs=[],edit=null,photoData='',videoData='',srcImg=null,queue=[],vqueue=[],focusY=50,adj={b:100,c:100,s:100,r:0};
+let data={moments:[],timers:[],dreams:[],letters:[],playlist:[],wishlist:[],movies:[],moods:[],presence:[],chat:[]},unsubs=[],edit=null,photoData='',videoData='',srcImg=null,queue=[],vqueue=[],focusY=50,adj={b:100,c:100,s:100,r:0};
+let chatOpen=false,chatLastMsgId=null,chatNotify=(localStorage.getItem('chatNotify')==='1');
 let presenceTimer=null,prevOnline={},presenceNotify=(localStorage.getItem('presenceNotify')==='1');
 let whoFilter='mine';
 let ytPlayer=null,ytReady=false,curIdx=-1,remindOn=(localStorage.getItem('remindOn')==='1'),swReg=null;
@@ -251,11 +273,14 @@ const getMs=i=>'dateMs'in i?(Number(i.dateMs)||0):(i.date?(new Date(i.date).getT
 
 let rndId=null,lastAll=[];
 /* Логін без пошти: Firebase вимагає email, тому до логіна дописується службовий домен */
-const DOM='@nashchas.invalid',toEmail=v=>{v=v.trim().toLowerCase();return v.includes('@')?v:v+DOM},shortName=e=>(e||'?').replace(DOM,'');
+const DOM='@nashchas.invalid';
+const TRANSLIT={а:'a',б:'b',в:'v',г:'h',ґ:'g',д:'d',е:'e',є:'ie',ж:'zh',з:'z',и:'y',і:'i',ї:'i',й:'i',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'kh',ц:'ts',ч:'ch',ш:'sh',щ:'shch',ю:'iu',я:'ia',ь:'',"'":'',"’":''};
+const translit=v=>[...v].map(c=>TRANSLIT[c]??c).join('');
+const toEmail=v=>{v=translit(v.trim().toLowerCase());return v.includes('@')?v:v+DOM},shortName=e=>(e||'?').replace(DOM,'');
 $('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';try{await signInWithEmailAndPassword(auth,toEmail($('email').value),$('password').value);$('password').value=''}catch(err){$('loginError').textContent=err.code==='auth/invalid-credential'?'Неправильний логін або пароль.':'Не вдалося увійти. Перевірте дані та інтернет.'}};
 $('logoutBtn').onclick=()=>signOut(auth);
 if(remindOn)$('remindBtn').classList.add('on');
-onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').classList.toggle('hidden',!!user);$('appPanel').classList.toggle('hidden',!user);$('userLine').textContent=user?'Ви увійшли разом ♡':'';clearInterval(presenceTimer);
+onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').classList.toggle('hidden',!!user);$('appPanel').classList.toggle('hidden',!user);$('chatBubble').classList.toggle('hidden',!user);if(!user){$('chatPanel').classList.add('hidden');chatOpen=false}$('userLine').textContent=user?'Ви увійшли разом ♡':'';clearInterval(presenceTimer);chatLastMsgId=null;
 if(user){logVisit(user);for(const key of Object.keys(data)){unsubs.push(onSnapshot(collection(db,key),snap=>{data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));renderAll()},err=>{console.error(err);toast('Не вдалося завантажити '+key+'. Перевіримо правила доступу.')}))}
 touchPresence();presenceTimer=setInterval(touchPresence,25000)}
 else{for(const k in data)data[k]=[];prevOnline={};renderAll()}});
@@ -333,7 +358,7 @@ const td=new Date(t),ot=mem.filter(i=>{const d=new Date(i.ms);return d.getMonth(
 $('todaySec').classList.toggle('hidden',!ot.length);$('todayList').innerHTML=ot.map(i=>{const n=td.getFullYear()-new Date(i.ms).getFullYear();return memCard(i,n+' '+yr(n)+' тому')}).join('');
 if(!mem.find(i=>i.id===rndId))rndId=mem.length?mem[Math.floor(Math.random()*mem.length)].id:null;
 $('randomMem').innerHTML=rndId?memCard(mem.find(i=>i.id===rndId)):empty('Додайте перший спогад ♡');
-lastAll=all;renderPlaylist();renderWish();renderMovies();renderMood();renderActivity(all);renderPresence();checkReminders(all);
+lastAll=all;renderPlaylist();renderWish();renderMovies();renderMood();renderActivity(all);renderPresence();renderChat();checkReminders(all);
 $('momentsList').innerHTML=mem.map(i=>memCard(i)).join('')||empty('Тут будуть ваші спільні спогади');
 $('dreamsList').innerHTML=wish.map(wishCard).join('')||empty('Запишіть мрію чи ідею, навіть без дати');
 $('lettersList').innerHTML=data.letters.slice().sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(letterCard).join('')||empty('Збережіть перший лист одне одному');
@@ -471,6 +496,27 @@ const prev=prevOnline[p.id];
 if(presenceNotify&&prev===false&&online)notify('Наш час ♡',presenceName(p.email)+' щойно відкрив(ла) сайт');
 prevOnline[p.id]=online;
 return `<div class="presRow"><span class="dot${online?' on':''}"></span>${online?`<b>${esc(presenceName(p.email))} зараз тут ♡</b>`:`${esc(presenceName(p.email))} — востаннє ${ms?dateFmt(ms):'давно'}`}</div>`}).join('')||''}
+
+
+/* ---- Чат ---- */
+function chatLastRead(){return +(localStorage.getItem('chatLastRead_'+(auth.currentUser?.uid||''))||0)}
+function setChatRead(){localStorage.setItem('chatLastRead_'+(auth.currentUser?.uid||''),String(now()))}
+$('chatBubble').onclick=()=>{chatOpen=!chatOpen;$('chatPanel').classList.toggle('hidden',!chatOpen);if(chatOpen){setChatRead();renderChatBadge();$('chatMsgs').scrollTop=$('chatMsgs').scrollHeight;setTimeout(()=>$('chatInput').focus(),200)}};
+$('chatClose').onclick=()=>{chatOpen=false;$('chatPanel').classList.add('hidden')};
+$('chatBell').onclick=async()=>{if(!await ensureNotifyPermission())return;chatNotify=!chatNotify;localStorage.setItem('chatNotify',chatNotify?'1':'0');$('chatBell').classList.toggle('on',chatNotify);toast(chatNotify?'Сповіщення про повідомлення увімкнено ❤️':'Сповіщення про повідомлення вимкнено')};
+if(chatNotify)$('chatBell').classList.add('on');
+$('chatForm').onsubmit=async e=>{e.preventDefault();const text=$('chatInput').value.trim();if(!text)return;$('chatInput').value='';
+try{await addDoc(collection(db,'chat'),{text,uid:auth.currentUser.uid,email:auth.currentUser.email||'',createdAt:serverTimestamp()})}catch(err){console.error(err);toast('Не вдалося надіслати повідомлення')}};
+function renderChatBadge(){const uid=auth.currentUser?.uid,lr=chatLastRead(),sec=x=>(x.createdAt?.seconds||0)*1000;
+const unread=data.chat.filter(m=>m.uid!==uid&&sec(m)>lr&&sec(m)>0).length;
+$('chatBadge').classList.toggle('hidden',!unread||chatOpen);$('chatBadge').textContent=unread>9?'9+':unread}
+function renderChat(){const uid=auth.currentUser?.uid,list=data.chat.slice().sort((a,b)=>(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0));
+$('chatMsgs').innerHTML=list.map(m=>`<div class="cmsg ${m.uid===uid?'me':'them'}">${esc(m.text)}</div>`).join('')||`<p class="muted tiny" style="padding:20px;text-align:center">Напишіть перше повідомлення ♡</p>`;
+if(chatOpen)$('chatMsgs').scrollTop=$('chatMsgs').scrollHeight;
+const newest=list[list.length-1];
+if(newest&&newest.id!==chatLastMsgId){if(chatLastMsgId!==null&&newest.uid!==uid&&chatNotify)notify('Наш час ♡','💬 '+(newest.text||'').slice(0,80));chatLastMsgId=newest.id}
+if(chatOpen)setChatRead();
+renderChatBadge()}
 
 function empty(t){return `<div class="empty"><b>♡</b>${t}</div>`}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
