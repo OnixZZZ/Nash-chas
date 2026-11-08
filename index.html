@@ -102,7 +102,7 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
  .nav{padding:9px 2px 0;gap:6px}.nav button{padding:6px 13px;font-size:12px}
  .hero{padding:34px 14px 28px}.gallery{grid-template-columns:repeat(2,1fr)}.sectionhead h2{font-size:26px}
  .modalback{place-items:end center;padding:0}.modal{border-radius:26px 26px 0 0}#lightbox{place-items:center;padding:10px}
- .chatBubble{right:14px;bottom:14px}.chatPanel{right:0;left:0;bottom:0;width:100%;max-width:100%;height:72vh;border-radius:22px 22px 0 0}
+ .chatWindow{right:0;left:0;width:100%;max-width:100%;border-radius:16px 16px 0 0}.chatBody{height:min(420px,62vh)}
 }
 .react{display:flex;gap:6px;flex-wrap:wrap;margin-top:12px}
 .rb{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:2px 12px;font-size:17px;line-height:1.6}
@@ -162,12 +162,16 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .dot{width:9px;height:9px;border-radius:50%;background:#c9c0c3;flex:none}
 .dot.on{background:#4caf7d;box-shadow:0 0 0 4px #4caf7d26}
 #presenceBtn.on{background:var(--wine);color:#fff;border-color:var(--wine)}
-.chatBubble{position:fixed;right:20px;bottom:20px;z-index:15;width:58px;height:58px;border-radius:50%;border:0;background:var(--wine);color:#fff;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 10px 26px #6b2f4550;cursor:pointer}
-.chatBadge{position:absolute;top:-4px;right:-4px;min-width:20px;height:20px;padding:0 5px;border-radius:99px;background:#ff5a6e;color:#fff;font:700 11px var(--sans);display:flex;align-items:center;justify-content:center;border:2px solid var(--bg)}
-.chatPanel{position:fixed;right:20px;bottom:88px;z-index:16;width:340px;max-width:calc(100vw - 32px);height:min(460px,70vh);background:#fff;border:1px solid var(--line);border-radius:22px;box-shadow:0 20px 50px #0004;display:flex;flex-direction:column;overflow:hidden}
-.chatHead{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--rose)}
-.chatHead b{font:700 15px var(--sans)}
-.chatHeadBtns{display:flex;gap:6px}
+.chatWindow{position:fixed;right:20px;bottom:0;z-index:15;width:340px;max-width:calc(100vw - 32px);background:#fff;border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0;box-shadow:0 10px 36px #6b2f4540;display:flex;flex-direction:column;overflow:hidden;transition:transform .2s}
+.chatHead{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--rose);flex:none}
+.chatHead b{font:700 15px var(--sans);flex:1}
+.chatCaret{font-size:12px;color:var(--wine);transition:transform .2s}
+.chatWindow.collapsed .chatCaret{transform:rotate(180deg)}
+.chatBody{display:flex;flex-direction:column;height:min(460px,65vh);overflow:hidden;transition:height .2s}
+.chatWindow.collapsed .chatBody{height:0}
+.chatWindow.collapsed .chatBody *{visibility:hidden}
+.chatToolbar{display:flex;justify-content:flex-end;padding:8px 10px 0}
+.chatBadge{min-width:20px;height:20px;padding:0 5px;border-radius:99px;background:#ff5a6e;color:#fff;font:700 11px var(--sans);display:flex;align-items:center;justify-content:center;flex:none}
 #chatBell.on{background:var(--wine);color:#fff;border-color:var(--wine)}
 .chatMsgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:3px}
 .cdate{align-self:center;margin:10px 0 6px;padding:3px 12px;background:var(--line);color:var(--muted);font:600 11px var(--sans);border-radius:99px}
@@ -251,13 +255,15 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 </section><div class="footer">Створено з любов'ю для вас двох · Наш час <span id="secret">♡</span></div></main><div id="toast" class="toast hidden"></div>
 <div id="modalBack" class="modalback hidden"><div class="modal"><div class="modalhead"><h2 id="modalTitle">Новий спогад</h2><button id="closeModal" class="btn light small">Закрити</button></div><form id="itemForm"><div id="modalFields"></div><p id="modalError" class="error"></p><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" type="submit">Зберегти</button><button id="cancelModal" class="btn light" type="button">Скасувати</button></div></form></div></div>
 <div id="lightbox" class="modalback hidden"><img id="lbImg" alt=""><video id="lbVid" class="hidden" controls autoplay></video><button id="lbDel" class="btn danger small hidden">Видалити фото</button></div>
-<button id="chatBubble" class="chatBubble hidden"><span>💬</span><span id="chatBadge" class="chatBadge hidden">0</span></button>
-<div id="chatPanel" class="chatPanel hidden">
-<div class="chatHead"><b>💬 Переписка</b><div class="chatHeadBtns"><button id="chatBell" class="btn light small">🔔</button><button id="chatClose" class="btn light small">✕</button></div></div>
+<div id="chatWindow" class="chatWindow hidden collapsed">
+<button id="chatHead" class="chatHead" type="button"><b>💬 Переписка</b><span id="chatBadge" class="chatBadge hidden">0</span><span class="chatCaret">▴</span></button>
+<div class="chatBody">
+<div class="chatToolbar"><button id="chatBell" class="btn light small">🔔</button></div>
 <div id="chatMsgs" class="chatMsgs"></div>
 <div id="chatTypingRow" class="chatTyping hidden"></div>
-<form id="chatForm" class="chatForm"><button type="button" id="chatAttach" class="btn light small">📎</button><input id="chatInput" type="text" placeholder="Напишіть щось тепле…" autocomplete="off"><button class="btn small" type="submit">➤</button></form>
-<input type="file" id="chatImgInput" accept="image/*" class="hidden">
+<form id="chatForm" class="chatForm"><button type="button" id="chatAttach" class="btn light small">📎</button><button type="button" id="chatRec" class="btn light small">🎙</button><span id="chatRecTime" class="chatRecTime hidden">0:00</span><input id="chatInput" type="text" placeholder="Напишіть щось тепле…" autocomplete="off"><button class="btn small" type="submit">➤</button></form>
+<input type="file" id="chatImgInput" accept="image/*,video/*" class="hidden">
+</div>
 </div>
 <div id="visitsBack" class="modalback hidden"><div class="modal"><div class="modalhead"><h2>Історія відвідувань</h2><button id="closeVisits" class="btn light small">Закрити</button></div><p class="muted tiny">Входи на сайт: акаунт, час і пристрій.</p><div id="visitsList"></div></div></div>
 <script type="module">
@@ -299,7 +305,7 @@ const toEmail=v=>{v=translit(v.trim().toLowerCase());return v.includes('@')?v:v+
 $('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';try{await signInWithEmailAndPassword(auth,toEmail($('email').value),$('password').value);$('password').value=''}catch(err){$('loginError').textContent=err.code==='auth/invalid-credential'?'Неправильний логін або пароль.':'Не вдалося увійти. Перевірте дані та інтернет.'}};
 $('logoutBtn').onclick=()=>signOut(auth);
 if(remindOn)$('remindBtn').classList.add('on');
-onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').classList.toggle('hidden',!!user);$('appPanel').classList.toggle('hidden',!user);$('chatBubble').classList.toggle('hidden',!user);if(!user){$('chatPanel').classList.add('hidden');chatOpen=false}$('userLine').textContent=user?'Ви увійшли разом ♡':'';clearInterval(presenceTimer);chatLastMsgId=null;
+onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').classList.toggle('hidden',!!user);$('appPanel').classList.toggle('hidden',!user);$('chatWindow').classList.toggle('hidden',!user);if(!user){$('chatWindow').classList.add('collapsed');chatOpen=false}$('userLine').textContent=user?'Ви увійшли разом ♡':'';clearInterval(presenceTimer);chatLastMsgId=null;
 if(user){logVisit(user);for(const key of Object.keys(data)){unsubs.push(onSnapshot(collection(db,key),snap=>{data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));renderAll()},err=>{console.error(err);toast('Не вдалося завантажити '+key+'. Перевіримо правила доступу.')}))}
 touchPresence();presenceTimer=setInterval(touchPresence,25000)}
 else{for(const k in data)data[k]=[];prevOnline={};renderAll()}});
@@ -520,8 +526,7 @@ return `<div class="presRow"><span class="dot${online?' on':''}"></span>${online
 /* ---- Чат (у стилі месенджера: статус прочитання, «друкує…», редагування, видалення, фото, реакції) ---- */
 const csec=x=>(x.createdAt?.seconds||0)*1000;
 function touchChatRead(){const u=auth.currentUser;if(!u)return;setDoc(doc(db,'chatReceipts',u.uid),{lastReadAt:serverTimestamp()}).catch(()=>{})}
-$('chatBubble').onclick=()=>{chatOpen=!chatOpen;$('chatPanel').classList.toggle('hidden',!chatOpen);if(chatOpen){touchChatRead();renderChatBadge();$('chatMsgs').scrollTop=$('chatMsgs').scrollHeight;setTimeout(()=>$('chatInput').focus(),200)}};
-$('chatClose').onclick=()=>{chatOpen=false;$('chatPanel').classList.add('hidden')};
+$('chatHead').onclick=()=>{chatOpen=!chatOpen;$('chatWindow').classList.toggle('collapsed',!chatOpen);if(chatOpen){touchChatRead();renderChatBadge();$('chatMsgs').scrollTop=$('chatMsgs').scrollHeight;setTimeout(()=>$('chatInput').focus(),300)}};
 $('chatBell').onclick=async()=>{if(!await ensureNotifyPermission())return;chatNotify=!chatNotify;localStorage.setItem('chatNotify',chatNotify?'1':'0');$('chatBell').classList.toggle('on',chatNotify);toast(chatNotify?'Сповіщення про повідомлення увімкнено ❤️':'Сповіщення про повідомлення вимкнено')};
 if(chatNotify)$('chatBell').classList.add('on');
 function stopTyping(){clearTimeout(window.typingTimer);const u=auth.currentUser;if(u)setDoc(doc(db,'chatTyping',u.uid),{typing:false,at:serverTimestamp()}).catch(()=>{})}
@@ -530,9 +535,24 @@ $('chatForm').onsubmit=async e=>{e.preventDefault();const text=$('chatInput').va
 try{await addDoc(collection(db,'chat'),{text,uid:auth.currentUser.uid,email:auth.currentUser.email||'',createdAt:serverTimestamp()})}catch(err){console.error(err);toast('Не вдалося надіслати повідомлення')}};
 $('chatAttach').onclick=()=>$('chatImgInput').click();
 $('chatImgInput').onchange=async()=>{const f=$('chatImgInput').files?.[0];$('chatImgInput').value='';if(!f)return;
-const text=$('chatInput').value.trim();$('chatInput').value='';stopTyping();toast('Надсилаємо фото…');
-try{const url=await uploadToCloudinary(f);await addDoc(collection(db,'chat'),{text,photo:url,uid:auth.currentUser.uid,email:auth.currentUser.email||'',createdAt:serverTimestamp()})}
-catch(err){console.error(err);toast('Не вдалося надіслати фото')}};
+const isVid=f.type.startsWith('video/');if(isVid&&f.size>60*1024*1024){toast('Відео завелике (максимум 60 МБ)');return}
+const text=$('chatInput').value.trim();$('chatInput').value='';stopTyping();toast(isVid?'Надсилаємо відео…':'Надсилаємо фото…');
+try{const url=await uploadToCloudinary(f);await addDoc(collection(db,'chat'),{text,[isVid?'video':'photo']:url,uid:auth.currentUser.uid,email:auth.currentUser.email||'',createdAt:serverTimestamp()})}
+catch(err){console.error(err);toast(isVid?'Не вдалося надіслати відео':'Не вдалося надіслати фото')}};
+let chatMediaRec=null,chatRecChunks=[],chatRecording=false,chatRecStart=0,chatRecTimer=null;
+async function startChatRec(){try{const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+const mime=['audio/webm;codecs=opus','audio/ogg;codecs=opus','audio/webm'].find(t=>MediaRecorder.isTypeSupported?.(t));
+chatMediaRec=new MediaRecorder(stream,{mimeType:mime,audioBitsPerSecond:32000});chatRecChunks=[];chatMediaRec.ondataavailable=e=>chatRecChunks.push(e.data);
+chatMediaRec.onstop=async()=>{stream.getTracks().forEach(t=>t.stop());const blob=new Blob(chatRecChunks,{type:chatMediaRec.mimeType||'audio/webm'});
+$('chatRec').textContent='⏳';$('chatRec').disabled=true;
+try{const url=await uploadToCloudinary(blob);await addDoc(collection(db,'chat'),{text:'',audio:url,uid:auth.currentUser.uid,email:auth.currentUser.email||'',createdAt:serverTimestamp()})}
+catch(err){console.error(err);toast('Не вдалося надіслати голосове')}
+$('chatRec').disabled=false;$('chatRec').textContent='🎙'};
+chatMediaRec.start();chatRecording=true;chatRecStart=now();$('chatRec').classList.add('on');$('chatRec').textContent='⏹';$('chatRecTime').classList.remove('hidden');
+chatRecTimer=setInterval(()=>{const s=Math.floor((now()-chatRecStart)/1000);$('chatRecTime').textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0')},250)}
+catch(err){console.error(err);toast('Немає доступу до мікрофона')}}
+function stopChatRec(){if(chatMediaRec&&chatRecording){chatMediaRec.stop();chatRecording=false;clearInterval(chatRecTimer);$('chatRec').classList.remove('on');$('chatRecTime').classList.add('hidden')}}
+$('chatRec').onclick=()=>chatRecording?stopChatRec():startChatRec();
 window.editMsg=async id=>{const m=data.chat.find(x=>x.id===id);if(!m)return;const val=prompt('Редагувати повідомлення:',m.text||'');if(val===null)return;const text=val.trim();if(!text)return;
 try{await updateDoc(doc(db,'chat',id),{text,edited:true,updatedAt:serverTimestamp()})}catch(e){toast('Не вдалося зберегти зміни')}};
 window.deleteMsg=async id=>{if(!confirm('Видалити повідомлення?'))return;try{await deleteDoc(doc(db,'chat',id))}catch(e){toast('Не вдалося видалити')}};
@@ -553,7 +573,7 @@ const time=ms?new Intl.DateTimeFormat('uk-UA',{hour:'2-digit',minute:'2-digit'})
 const hearts=m.hearts||{},hc=Object.values(hearts).filter(Boolean).length,myHeart=uid&&!!hearts[uid];
 const seen=mine&&theirRead>=ms&&ms>0;
 html+=`<div class="cmsgwrap ${mine?'me':'them'}" onclick="this.classList.toggle('show')">
-<div class="cbubble">${m.photo?`<img class="cimg" src="${attr(m.photo)}" alt="" loading="lazy" onclick="window.open('${attr(m.photo)}','_blank')">`:''}${m.text?`<span class="ctext">${esc(m.text)}</span>`:''}<span class="ctime">${m.edited?'ред. · ':''}${time}${mine?(seen?' ✓✓':' ✓'):''}</span></div>
+<div class="cbubble">${m.photo?`<img class="cimg" src="${attr(m.photo)}" alt="" loading="lazy" onclick="window.open('${attr(m.photo)}','_blank')">`:''}${m.video?`<video class="cvid" src="${attr(m.video)}" controls preload="none"></video>`:''}${m.audio?`<audio class="caud" src="${attr(m.audio)}" controls preload="none"></audio>`:''}${m.text?`<span class="ctext">${esc(m.text)}</span>`:''}<span class="ctime">${m.edited?'ред. · ':''}${time}${mine?(seen?' ✓✓':' ✓'):''}</span></div>
 ${hc?`<button class="cheart${myHeart?' mine':''}" onclick="toggleHeart('${m.id}')">❤️ ${hc}</button>`:''}
 <div class="cactions"><button onclick="toggleHeart('${m.id}')" title="Реакція">❤️</button>${mine?`<button onclick="editMsg('${m.id}')" title="Редагувати">✎</button><button onclick="deleteMsg('${m.id}')" title="Видалити">🗑</button>`:''}</div>
 </div>`});
@@ -563,7 +583,7 @@ const isTyping=theirTyping?.typing&&now()-typingAt<6000;
 $('chatTypingRow').classList.toggle('hidden',!isTyping);if(isTyping)$('chatTypingRow').textContent=presenceName(theirTyping.email)+' друкує…';
 if(chatOpen)$('chatMsgs').scrollTop=$('chatMsgs').scrollHeight;
 const newest=list[list.length-1];
-if(newest&&newest.id!==chatLastMsgId){if(chatLastMsgId!==null&&newest.uid!==uid&&chatNotify)notify('Наш час ♡','💬 '+(newest.photo&&!newest.text?'Фото':(newest.text||'')).slice(0,80));chatLastMsgId=newest.id;if(chatOpen)touchChatRead()}
+if(newest&&newest.id!==chatLastMsgId){if(chatLastMsgId!==null&&newest.uid!==uid&&chatNotify)notify('Наш час ♡','💬 '+(newest.text||(newest.photo?'Фото':newest.video?'Відео':newest.audio?'Голосове':'')).slice(0,80));chatLastMsgId=newest.id;if(chatOpen)touchChatRead()}
 renderChatBadge()}
 
 function empty(t){return `<div class="empty"><b>♡</b>${t}</div>`}
