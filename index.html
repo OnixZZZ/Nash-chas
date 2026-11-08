@@ -21,14 +21,14 @@ button,input,textarea,select{font:inherit}button{cursor:pointer}
 .userline{font-size:13px;color:var(--muted)}
 .topline{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:6px 0 4px}
 
-.navgroups{position:sticky;top:0;z-index:6;display:flex;gap:10px;overflow:auto;padding:12px 2px;margin-bottom:6px;background:#faf6f2ee;backdrop-filter:blur(10px);border-bottom:1px solid var(--line);scrollbar-width:none}
-.ng{flex:none;display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:9px 18px 9px 10px;color:var(--muted);font-weight:700;font-size:14px}
-.ngIcon{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--rose);font-size:15px}
-.ng.active{background:var(--wine);color:#fff;border-color:var(--wine)}
-.ng.active .ngIcon{background:#ffffff33}
-.nav{position:sticky;top:57px;z-index:5;display:flex;gap:10px;overflow:auto;padding:4px 2px 14px;margin-bottom:20px;background:#faf6f2ee;backdrop-filter:blur(10px);border-bottom:1px solid var(--line);scrollbar-width:none}
-.nav button{white-space:nowrap;background:#fff;border:1.5px solid var(--line);border-radius:99px;padding:9px 18px;color:var(--muted);font-weight:700;font-size:14px}
-.nav button.active{color:#fff;background:var(--wine);border-color:var(--wine)}
+.navwrap{position:sticky;top:0;z-index:6;background:#faf6f2;padding-top:10px;margin-bottom:24px}
+.navgroups{display:flex;gap:28px;padding:0 2px 12px;border-bottom:1px solid var(--line)}
+.ng{flex:none;background:none;border:0;padding:4px 0;color:var(--muted);font:600 15px var(--sans);letter-spacing:.2px;border-bottom:2px solid transparent}
+.ng .ngIcon{margin-right:6px;font-size:14px;opacity:.85}
+.ng.active{color:var(--wine);border-bottom-color:var(--wine);font-weight:700}
+.nav{display:flex;flex-wrap:wrap;gap:8px;padding:12px 2px 0}
+.nav button{white-space:nowrap;background:transparent;border:1px solid var(--line);border-radius:99px;padding:6px 16px;color:var(--muted);font:600 13px var(--sans)}
+.nav button.active{color:var(--wine);background:var(--rose);border-color:#e3b9c4}
 .view{display:none}.view.active{display:block}
 
 .panel{background:#fff;border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:var(--shadow)}
@@ -98,8 +98,8 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .footer{text-align:center;color:var(--muted);font:italic 16px var(--serif);margin-top:46px}
 @media(max-width:720px){
  .shell{padding:16px 14px 50px}.quickadd{gap:9px}.qa{width:66px;padding:11px 2px 8px}.qaIcon{width:36px;height:36px;font-size:17px}.brandmark{font-size:30px}.grid{grid-template-columns:1fr;gap:18px}
- .navgroups{top:0;padding:9px 2px}.ng{padding:7px 14px 7px 7px;font-size:13px}.ngIcon{width:26px;height:26px;font-size:13px}.ng span:last-child{display:none}.ng.active span:last-child{display:inline}
- .nav{top:46px;padding:4px 2px 10px}.nav button{padding:7px 14px;font-size:13px}
+ .navwrap{padding-top:8px}.navgroups{gap:18px;padding-bottom:9px}.ng{font-size:13px}
+ .nav{padding:9px 2px 0;gap:6px}.nav button{padding:6px 13px;font-size:12px}
  .hero{padding:34px 14px 28px}.gallery{grid-template-columns:repeat(2,1fr)}.sectionhead h2{font-size:26px}
  .modalback{place-items:end center;padding:0}.modal{border-radius:26px 26px 0 0}#lightbox{place-items:center;padding:10px}
 }
@@ -156,6 +156,11 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .activity{display:grid;gap:8px;margin-bottom:6px}
 .arow{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border:1px solid var(--line);border-radius:16px;font-size:14px}
 .aicon{font-size:18px;flex:none}
+#presenceLine{margin:4px 0 18px}
+.presRow{display:flex;align-items:center;gap:9px;padding:10px 16px;background:#fff;border:1px solid var(--line);border-radius:99px;font-size:14px;width:fit-content}
+.dot{width:9px;height:9px;border-radius:50%;background:#c9c0c3;flex:none}
+.dot.on{background:#4caf7d;box-shadow:0 0 0 4px #4caf7d26}
+#presenceBtn.on{background:var(--wine);color:#fff;border-color:var(--wine)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 </style>
@@ -163,7 +168,8 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 </head><body><main class="shell">
 <header class="brand"><div><div class="brandmark">Наш час ♡</div><small>спогади, які вже були, і мрії, до яких ми йдемо</small></div><div id="userLine" class="userline"></div></header>
 <section id="loginPanel" class="panel login"><h1>Наш маленький простір ♡</h1><p class="muted tiny">Увійдіть, щоб зберігати вашу спільну історію.</p><form id="loginForm"><div class="field"><label>Логін</label><input id="email" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" required></div><div class="field"><label>Пароль</label><input id="password" type="password" autocomplete="current-password" required></div><button id="loginSubmit" class="btn" style="width:100%">Увійти ❤️</button><p id="loginError" class="error"></p></form></section>
-<section id="appPanel" class="hidden"><div class="topline"><div class="muted tiny">Ваш простір для двох 💗</div><button id="remindBtn" class="btn light small">🔔 Нагадування</button><button id="logoutBtn" class="btn light small">Вийти</button></div>
+<section id="appPanel" class="hidden"><div class="topline"><div class="muted tiny">Ваш простір для двох 💗</div><button id="remindBtn" class="btn light small">🔔 Нагадування</button><button id="presenceBtn" class="btn light small">💬 Партнер прийшов</button><button id="logoutBtn" class="btn light small">Вийти</button></div>
+<div class="navwrap">
 <nav class="navgroups" id="navGroups">
 <button class="ng active" data-view="dashboard"><span class="ngIcon">🏠</span><span>Дім</span></button>
 <button class="ng" data-group="story"><span class="ngIcon">📖</span><span>Історія</span></button>
@@ -180,7 +186,9 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 <button data-view="music" data-group="media">🎵 Музика</button>
 <button data-view="gallery" data-group="media">🖼 Галерея</button>
 </nav>
+</div>
 <section class="view active" id="view-dashboard"><div class="hero"><h1 id="greeting">Кожна мить — наша.</h1><div class="together"><div class="muted tiny">ми разом вже</div><div id="togetherCount" class="number">—</div><div class="muted tiny">днів нашої історії</div><div id="togetherHint" class="tiny muted"></div></div></div>
+<div id="presenceLine"></div>
 <div class="quickadd" id="quickAdd"></div>
 <div class="stats"><div class="stat"><strong id="momentsCount">0</strong><span>спогадів</span></div><div class="stat"><strong id="plansCount">0</strong><span>мрій та ідей</span></div><div class="stat"><strong id="lettersCount">0</strong><span>листів</span></div></div>
 <div class="sectionhead"><h2>Остання активність</h2></div><div id="activityList" class="activity"></div>
@@ -228,7 +236,8 @@ xhr.ontimeout=()=>reject(Object.assign(Error('timeout'),{code:'timeout'}));
 xhr.send(fd)
 })}
 async function uploadVideo(file,onProgress){if(file.size>60*1024*1024)throw Error('toobig');return uploadToCloudinary(file,onProgress)}
-let data={moments:[],timers:[],dreams:[],letters:[],playlist:[],wishlist:[],movies:[],moods:[]},unsubs=[],edit=null,photoData='',videoData='',srcImg=null,queue=[],vqueue=[],focusY=50,adj={b:100,c:100,s:100,r:0};
+let data={moments:[],timers:[],dreams:[],letters:[],playlist:[],wishlist:[],movies:[],moods:[],presence:[]},unsubs=[],edit=null,photoData='',videoData='',srcImg=null,queue=[],vqueue=[],focusY=50,adj={b:100,c:100,s:100,r:0};
+let presenceTimer=null,prevOnline={},presenceNotify=(localStorage.getItem('presenceNotify')==='1');
 let whoFilter='mine';
 let ytPlayer=null,ytReady=false,curIdx=-1,remindOn=(localStorage.getItem('remindOn')==='1'),swReg=null;
 
@@ -246,7 +255,11 @@ const DOM='@nashchas.invalid',toEmail=v=>{v=v.trim().toLowerCase();return v.incl
 $('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';try{await signInWithEmailAndPassword(auth,toEmail($('email').value),$('password').value);$('password').value=''}catch(err){$('loginError').textContent=err.code==='auth/invalid-credential'?'Неправильний логін або пароль.':'Не вдалося увійти. Перевірте дані та інтернет.'}};
 $('logoutBtn').onclick=()=>signOut(auth);
 if(remindOn)$('remindBtn').classList.add('on');
-onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').classList.toggle('hidden',!!user);$('appPanel').classList.toggle('hidden',!user);$('userLine').textContent=user?'Ви увійшли разом ♡':'';if(user){logVisit(user);for(const key of Object.keys(data)){unsubs.push(onSnapshot(collection(db,key),snap=>{data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));renderAll()},err=>{console.error(err);toast('Не вдалося завантажити '+key+'. Перевіримо правила доступу.')}))}}else{for(const k in data)data[k]=[];renderAll()}});
+onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').classList.toggle('hidden',!!user);$('appPanel').classList.toggle('hidden',!user);$('userLine').textContent=user?'Ви увійшли разом ♡':'';clearInterval(presenceTimer);
+if(user){logVisit(user);for(const key of Object.keys(data)){unsubs.push(onSnapshot(collection(db,key),snap=>{data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));renderAll()},err=>{console.error(err);toast('Не вдалося завантажити '+key+'. Перевіримо правила доступу.')}))}
+touchPresence();presenceTimer=setInterval(touchPresence,25000)}
+else{for(const k in data)data[k]=[];prevOnline={};renderAll()}});
+function touchPresence(){const u=auth.currentUser;if(!u)return;setDoc(doc(db,'presence',u.uid),{email:u.email||'',lastSeen:serverTimestamp()}).catch(()=>{})}
 
 $('nav').onclick=e=>{const b=e.target.closest('button[data-view]');if(b)showView(b.dataset.view)};
 const GROUP_OF={moments:'story',dreams:'story',letters:'together',wishlist:'together',movies:'together',mood:'together',music:'media',gallery:'media'};
@@ -320,7 +333,7 @@ const td=new Date(t),ot=mem.filter(i=>{const d=new Date(i.ms);return d.getMonth(
 $('todaySec').classList.toggle('hidden',!ot.length);$('todayList').innerHTML=ot.map(i=>{const n=td.getFullYear()-new Date(i.ms).getFullYear();return memCard(i,n+' '+yr(n)+' тому')}).join('');
 if(!mem.find(i=>i.id===rndId))rndId=mem.length?mem[Math.floor(Math.random()*mem.length)].id:null;
 $('randomMem').innerHTML=rndId?memCard(mem.find(i=>i.id===rndId)):empty('Додайте перший спогад ♡');
-lastAll=all;renderPlaylist();renderWish();renderMovies();renderMood();renderActivity(all);checkReminders(all);
+lastAll=all;renderPlaylist();renderWish();renderMovies();renderMood();renderActivity(all);renderPresence();checkReminders(all);
 $('momentsList').innerHTML=mem.map(i=>memCard(i)).join('')||empty('Тут будуть ваші спільні спогади');
 $('dreamsList').innerHTML=wish.map(wishCard).join('')||empty('Запишіть мрію чи ідею, навіть без дати');
 $('lettersList').innerHTML=data.letters.slice().sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).map(letterCard).join('')||empty('Збережіть перший лист одне одному');
@@ -358,12 +371,17 @@ let title='',author='',thumb='';try{const r=await fetch('https://www.youtube.com
 try{await addDoc(collection(db,'playlist'),{videoId:vid,url,title,author,thumb,addedBy:auth.currentUser?.email||'',createdAt:serverTimestamp()});$('trackUrl').value='';toast('Трек додано ❤️')}catch(err){console.error(err);$('trackError').textContent='Не вдалося зберегти трек.'}};
 
 /* ---- Нагадування (сповіщення браузера про мрії з наближеною датою) ---- */
-$('remindBtn').onclick=async()=>{
-if(isIOS()&&!isStandalone()){alert('На iPhone сповіщення працюють лише після додавання сайту на головний екран.\n\n1. Натисніть кнопку «Поділитися» внизу Safari.\n2. Оберіть «На початковий екран».\n3. Відкрийте сайт зі значка на екрані та ввімкніть нагадування ще раз.');return}
-if(!('Notification'in window)){toast(isIOS()?'Оновіть iOS до версії 16.4 або новішої для сповіщень':'Цей браузер не підтримує сповіщення');return}
-if(Notification.permission==='denied'){toast('Сповіщення заблоковані в налаштуваннях браузера чи сайту');return}
-if(Notification.permission!=='granted'){let p;try{p=await Notification.requestPermission()}catch{toast('Не вдалося запитати дозвіл на сповіщення');return}if(p!=='granted'){toast('Дозвіл не надано');return}}
+async function ensureNotifyPermission(){
+if(isIOS()&&!isStandalone()){alert('На iPhone сповіщення працюють лише після додавання сайту на головний екран.\n\n1. Натисніть кнопку «Поділитися» внизу Safari.\n2. Оберіть «На початковий екран».\n3. Відкрийте сайт зі значка на екрані та ввімкніть сповіщення ще раз.');return false}
+if(!('Notification'in window)){toast(isIOS()?'Оновіть iOS до версії 16.4 або новішої для сповіщень':'Цей браузер не підтримує сповіщення');return false}
+if(Notification.permission==='denied'){toast('Сповіщення заблоковані в налаштуваннях браузера чи сайту');return false}
+if(Notification.permission!=='granted'){let p;try{p=await Notification.requestPermission()}catch{toast('Не вдалося запитати дозвіл на сповіщення');return false}if(p!=='granted'){toast('Дозвіл не надано');return false}}
+return true}
+$('remindBtn').onclick=async()=>{if(!await ensureNotifyPermission())return;
 remindOn=!remindOn;localStorage.setItem('remindOn',remindOn?'1':'0');$('remindBtn').classList.toggle('on',remindOn);toast(remindOn?'Нагадування увімкнено ❤️':'Нагадування вимкнено');if(remindOn)checkReminders(lastAll,true)};
+$('presenceBtn').onclick=async()=>{if(!await ensureNotifyPermission())return;
+presenceNotify=!presenceNotify;localStorage.setItem('presenceNotify',presenceNotify?'1':'0');$('presenceBtn').classList.toggle('on',presenceNotify);toast(presenceNotify?'Сповіщення про вхід партнера увімкнено ❤️':'Сповіщення про вхід партнера вимкнено')};
+if(presenceNotify)$('presenceBtn').classList.add('on');
 function checkReminders(all,force){if(!remindOn||!('Notification'in window)||Notification.permission!=='granted')return;
 const today=new Date().toISOString().slice(0,10);if(!force&&localStorage.getItem('remindDay')===today)return;localStorage.setItem('remindDay',today);
 const t=now(),soon=all.filter(i=>!i.done&&i.ms&&i.ms>=t&&i.ms-t<=3*864e5);
@@ -442,6 +460,17 @@ data.wishlist.forEach(w=>items.push({ms:sec(w),icon:'🎁',text:(w.owner===uid?'
 data.movies.forEach(m=>items.push({ms:sec(m),icon:'🎬',text:'Додано фільм: '+m.title}));
 data.playlist.forEach(t=>items.push({ms:sec(t),icon:'🎵',text:'Новий трек: '+(t.title||'YouTube')}));
 $('activityList').innerHTML=items.filter(x=>x.ms).sort((a,b)=>b.ms-a.ms).slice(0,6).map(x=>`<div class="arow"><span class="aicon">${x.icon}</span><span>${esc(x.text)}</span></div>`).join('')||empty('Тут з’являтиметься все нове, що ви додасте ♡')}
+
+
+/* ---- Хтось зараз на сайті ---- */
+function presenceName(email){const n=shortName(email);return n?n.charAt(0).toUpperCase()+n.slice(1):'Партнер(ка)'}
+function renderPresence(){const uid=auth.currentUser?.uid,t=now();
+const others=data.presence.filter(p=>p.id!==uid);
+$('presenceLine').innerHTML=others.map(p=>{const ms=(p.lastSeen?.seconds||0)*1000,online=ms&&t-ms<60000;
+const prev=prevOnline[p.id];
+if(presenceNotify&&prev===false&&online)notify('Наш час ♡',presenceName(p.email)+' щойно відкрив(ла) сайт');
+prevOnline[p.id]=online;
+return `<div class="presRow"><span class="dot${online?' on':''}"></span>${online?`<b>${esc(presenceName(p.email))} зараз тут ♡</b>`:`${esc(presenceName(p.email))} — востаннє ${ms?dateFmt(ms):'давно'}`}</div>`}).join('')||''}
 
 function empty(t){return `<div class="empty"><b>♡</b>${t}</div>`}
 function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
