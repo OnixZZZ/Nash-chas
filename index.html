@@ -120,7 +120,6 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .player{background:#fff;border:1px solid var(--line);border-radius:22px;padding:16px;box-shadow:var(--shadow);margin-bottom:18px}
 #ytPlayer{aspect-ratio:16/9;width:100%;border-radius:16px;overflow:hidden;background:#000}
 .pctl{display:flex;gap:8px;margin-top:12px}.pctl button{flex:1}
-#remindBtn.on{background:var(--wine);color:#fff;border-color:var(--wine)}
 .addtrack{display:flex;gap:8px;margin-bottom:14px}.addtrack input{flex:1;border:1.5px solid var(--line);border-radius:14px;padding:11px 14px}
 .tracklist{display:grid;gap:10px}
 .track{display:flex;align-items:center;gap:12px;padding:8px;background:#fff;border:1px solid var(--line);border-radius:16px}
@@ -161,7 +160,6 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .presRow{display:flex;align-items:center;gap:9px;padding:10px 16px;background:#fff;border:1px solid var(--line);border-radius:99px;font-size:14px;width:fit-content}
 .dot{width:9px;height:9px;border-radius:50%;background:#c9c0c3;flex:none}
 .dot.on{background:#4caf7d;box-shadow:0 0 0 4px #4caf7d26}
-#presenceBtn.on{background:var(--wine);color:#fff;border-color:var(--wine)}
 .chatWindow{position:fixed;right:20px;bottom:0;z-index:15;width:340px;max-width:calc(100vw - 32px);background:#fff;border:1px solid var(--line);border-bottom:0;border-radius:16px 16px 0 0;box-shadow:0 10px 36px #6b2f4540;display:flex;flex-direction:column;overflow:hidden;transition:transform .2s}
 .chatHead{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:14px 16px;background:var(--rose);flex:none}
 .chatHead b{font:700 15px var(--sans);flex:1}
@@ -172,7 +170,6 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .chatWindow.collapsed .chatBody *{visibility:hidden}
 .chatToolbar{display:flex;justify-content:flex-end;padding:8px 10px 0}
 .chatBadge{min-width:20px;height:20px;padding:0 5px;border-radius:99px;background:#ff5a6e;color:#fff;font:700 11px var(--sans);display:flex;align-items:center;justify-content:center;flex:none}
-#chatBell.on{background:var(--wine);color:#fff;border-color:var(--wine)}
 .chatMsgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:3px}
 .cdate{align-self:center;margin:10px 0 6px;padding:3px 12px;background:var(--line);color:var(--muted);font:600 11px var(--sans);border-radius:99px}
 .cmsgwrap{max-width:82%;display:flex;flex-direction:column;gap:3px;margin:3px 0}
@@ -197,14 +194,26 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .chatForm input{flex:1;border:1.5px solid var(--line);border-radius:99px;padding:10px 16px;min-width:0}
 .chatForm button[type=submit]{border-radius:50%;width:42px;height:42px;padding:0;display:flex;align-items:center;justify-content:center;font-size:16px;flex:none}
 #chatAttach{border-radius:50%;width:38px;height:38px;padding:0;font-size:15px;flex:none}
+.notifyWrap{position:relative}
+#notifyBtn.on{background:var(--wine);color:#fff;border-color:var(--wine)}
+.notifyMenu{position:absolute;top:calc(100% + 8px);right:0;z-index:12;width:240px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 14px 34px #0003;padding:8px}
+.notifyRow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 8px;font-size:13px;color:var(--ink);cursor:pointer}
+.notifyRow:not(:last-child){border-bottom:1px solid var(--line)}
+.notifyRow input{width:38px;height:22px;appearance:none;background:var(--line);border-radius:99px;position:relative;cursor:pointer;flex:none;transition:background .15s}
+.notifyRow input::before{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px #0003}
+.notifyRow input:checked{background:var(--wine)}
+.notifyRow input:checked::before{transform:translateX(16px)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 </style>
-<script src="https://www.youtube.com/iframe_api"></script>
 </head><body><main class="shell">
 <header class="brand"><div><div class="brandmark">Наш час ♡</div><small>спогади, які вже були, і мрії, до яких ми йдемо</small></div><div id="userLine" class="userline"></div></header>
 <section id="loginPanel" class="panel login"><h1>Наш маленький простір ♡</h1><p class="muted tiny">Увійдіть, щоб зберігати вашу спільну історію.</p><form id="loginForm"><div class="field"><label>Логін</label><input id="email" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" required></div><div class="field"><label>Пароль</label><input id="password" type="password" autocomplete="current-password" required></div><button id="loginSubmit" class="btn" style="width:100%">Увійти ❤️</button><p id="loginError" class="error"></p></form></section>
-<section id="appPanel" class="hidden"><div class="topline"><div class="muted tiny">Ваш простір для двох 💗</div><button id="remindBtn" class="btn light small">🔔 Нагадування</button><button id="presenceBtn" class="btn light small">💬 Партнер прийшов</button><button id="logoutBtn" class="btn light small">Вийти</button></div>
+<section id="appPanel" class="hidden"><div class="topline"><div class="muted tiny">Ваш простір для двох 💗</div><div class="notifyWrap"><button id="notifyBtn" class="btn light small">🔔</button><div id="notifyMenu" class="notifyMenu hidden">
+<label class="notifyRow"><span>Нагадування про мрії</span><input type="checkbox" id="notifyRemind"></label>
+<label class="notifyRow"><span>Прихід партнера</span><input type="checkbox" id="notifyPresence"></label>
+<label class="notifyRow"><span>Нові повідомлення в чаті</span><input type="checkbox" id="notifyChat"></label>
+</div></div><button id="logoutBtn" class="btn light small">Вийти</button></div>
 <div class="navwrap">
 <nav class="navgroups" id="navGroups">
 <button class="ng active" data-view="dashboard"><span class="ngIcon">🏠</span><span>Дім</span></button>
@@ -258,7 +267,6 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 <div id="chatWindow" class="chatWindow hidden collapsed">
 <button id="chatHead" class="chatHead" type="button"><b>💬 Переписка</b><span id="chatBadge" class="chatBadge hidden">0</span><span class="chatCaret">▴</span></button>
 <div class="chatBody">
-<div class="chatToolbar"><button id="chatBell" class="btn light small">🔔</button></div>
 <div id="chatMsgs" class="chatMsgs"></div>
 <div id="chatTypingRow" class="chatTyping hidden"></div>
 <form id="chatForm" class="chatForm"><button type="button" id="chatAttach" class="btn light small">📎</button><button type="button" id="chatRec" class="btn light small">🎙</button><span id="chatRecTime" class="chatRecTime hidden">0:00</span><input id="chatInput" type="text" placeholder="Напишіть щось тепле…" autocomplete="off"><button class="btn small" type="submit">➤</button></form>
@@ -287,6 +295,7 @@ let chatOpen=false,chatLastMsgId=null,chatNotify=(localStorage.getItem('chatNoti
 let presenceTimer=null,prevOnline={},presenceNotify=(localStorage.getItem('presenceNotify')==='1');
 let whoFilter='mine';
 let ytPlayer=null,ytReady=false,curIdx=-1,remindOn=(localStorage.getItem('remindOn')==='1'),swReg=null;
+/* Скрипт YouTube підключаємо лише ПІСЛЯ того, як window.onYouTubeIframeAPIReady уже оголошено нижче — інакше можлива гонитва умов і плеєр не створюється взагалі */
 
 const isStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
 const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)&&!window.MSStream;
@@ -304,7 +313,6 @@ const translit=v=>[...v].map(c=>TRANSLIT[c]??c).join('');
 const toEmail=v=>{v=translit(v.trim().toLowerCase());return v.includes('@')?v:v+DOM},shortName=e=>(e||'?').replace(DOM,'');
 $('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';try{await signInWithEmailAndPassword(auth,toEmail($('email').value),$('password').value);$('password').value=''}catch(err){$('loginError').textContent=err.code==='auth/invalid-credential'?'Неправильний логін або пароль.':'Не вдалося увійти. Перевірте дані та інтернет.'}};
 $('logoutBtn').onclick=()=>signOut(auth);
-if(remindOn)$('remindBtn').classList.add('on');
 onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').classList.toggle('hidden',!!user);$('appPanel').classList.toggle('hidden',!user);$('chatWindow').classList.toggle('hidden',!user);if(!user){$('chatWindow').classList.add('collapsed');chatOpen=false}$('userLine').textContent=user?'Ви увійшли разом ♡':'';clearInterval(presenceTimer);chatLastMsgId=null;
 if(user){logVisit(user);for(const key of Object.keys(data)){unsubs.push(onSnapshot(collection(db,key),snap=>{data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));renderAll()},err=>{console.error(err);toast('Не вдалося завантажити '+key+'. Перевіримо правила доступу.')}))}
 touchPresence();presenceTimer=setInterval(touchPresence,25000)}
@@ -409,6 +417,7 @@ $('lightbox').onclick=e=>{if(e.target.id==='lightbox')e.currentTarget.classList.
 /* ---- Спільна музика (YouTube) ---- */
 function parseYtId(u){u=(u||'').trim();let m=u.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/|live\/))([\w-]{11})/);if(m)return m[1];m=u.match(/^[\w-]{11}$/);return m?u:null}
 window.onYouTubeIframeAPIReady=()=>{ytPlayer=new YT.Player('ytPlayer',{height:'100%',width:'100%',playerVars:{rel:0,playsinline:1},events:{onReady:()=>{ytReady=true},onStateChange:e=>{if(e.data===YT.PlayerState.PLAYING)$('pPlay').textContent='⏸ Пауза';if(e.data===YT.PlayerState.PAUSED)$('pPlay').textContent='▶ Відтворити';if(e.data===YT.PlayerState.ENDED)playAt(curIdx+1)}}})};
+(function loadYT(){const s=document.createElement('script');s.src='https://www.youtube.com/iframe_api';document.head.appendChild(s)})();
 function playAt(i){const list=sortedPlaylist();if(!list.length)return;if(i<0)i=list.length-1;if(i>=list.length)i=0;curIdx=i;const t=list[i];if(ytReady&&ytPlayer){ytPlayer.loadVideoById(t.videoId);ytPlayer.playVideo()}$('nowPlaying').textContent='Зараз грає: '+(t.title||'YouTube трек');renderPlaylist()}
 $('pPlay').onclick=()=>{if(!ytReady)return;if(curIdx<0)return playAt(0);const st=ytPlayer.getPlayerState();st===1?ytPlayer.pauseVideo():ytPlayer.playVideo()};
 $('pNext').onclick=()=>playAt(curIdx+1);$('pPrev').onclick=()=>playAt(curIdx-1);
@@ -427,11 +436,16 @@ if(!('Notification'in window)){toast(isIOS()?'Оновіть iOS до версі
 if(Notification.permission==='denied'){toast('Сповіщення заблоковані в налаштуваннях браузера чи сайту');return false}
 if(Notification.permission!=='granted'){let p;try{p=await Notification.requestPermission()}catch{toast('Не вдалося запитати дозвіл на сповіщення');return false}if(p!=='granted'){toast('Дозвіл не надано');return false}}
 return true}
-$('remindBtn').onclick=async()=>{if(!await ensureNotifyPermission())return;
-remindOn=!remindOn;localStorage.setItem('remindOn',remindOn?'1':'0');$('remindBtn').classList.toggle('on',remindOn);toast(remindOn?'Нагадування увімкнено ❤️':'Нагадування вимкнено');if(remindOn)checkReminders(lastAll,true)};
-$('presenceBtn').onclick=async()=>{if(!await ensureNotifyPermission())return;
-presenceNotify=!presenceNotify;localStorage.setItem('presenceNotify',presenceNotify?'1':'0');$('presenceBtn').classList.toggle('on',presenceNotify);toast(presenceNotify?'Сповіщення про вхід партнера увімкнено ❤️':'Сповіщення про вхід партнера вимкнено')};
-if(presenceNotify)$('presenceBtn').classList.add('on');
+function syncNotifyBtn(){const any=remindOn||presenceNotify||chatNotify;$('notifyBtn').classList.toggle('on',any);$('notifyBtn').textContent=any?'🔔':'🔕'}
+$('notifyRemind').checked=remindOn;$('notifyPresence').checked=presenceNotify;$('notifyChat').checked=chatNotify;syncNotifyBtn();
+$('notifyBtn').onclick=e=>{e.stopPropagation();$('notifyMenu').classList.toggle('hidden')};
+document.addEventListener('click',e=>{if(!e.target.closest('.notifyWrap'))$('notifyMenu').classList.add('hidden')});
+$('notifyRemind').onchange=async e=>{if(e.target.checked&&!await ensureNotifyPermission()){e.target.checked=false;return}
+remindOn=e.target.checked;localStorage.setItem('remindOn',remindOn?'1':'0');syncNotifyBtn();if(remindOn)checkReminders(lastAll,true)};
+$('notifyPresence').onchange=async e=>{if(e.target.checked&&!await ensureNotifyPermission()){e.target.checked=false;return}
+presenceNotify=e.target.checked;localStorage.setItem('presenceNotify',presenceNotify?'1':'0');syncNotifyBtn()};
+$('notifyChat').onchange=async e=>{if(e.target.checked&&!await ensureNotifyPermission()){e.target.checked=false;return}
+chatNotify=e.target.checked;localStorage.setItem('chatNotify',chatNotify?'1':'0');syncNotifyBtn()};
 function checkReminders(all,force){if(!remindOn||!('Notification'in window)||Notification.permission!=='granted')return;
 const today=new Date().toISOString().slice(0,10);if(!force&&localStorage.getItem('remindDay')===today)return;localStorage.setItem('remindDay',today);
 const t=now(),soon=all.filter(i=>!i.done&&i.ms&&i.ms>=t&&i.ms-t<=3*864e5);
@@ -527,8 +541,7 @@ return `<div class="presRow"><span class="dot${online?' on':''}"></span>${online
 const csec=x=>(x.createdAt?.seconds||0)*1000;
 function touchChatRead(){const u=auth.currentUser;if(!u)return;setDoc(doc(db,'chatReceipts',u.uid),{lastReadAt:serverTimestamp()}).catch(()=>{})}
 $('chatHead').onclick=()=>{chatOpen=!chatOpen;$('chatWindow').classList.toggle('collapsed',!chatOpen);if(chatOpen){touchChatRead();renderChatBadge();$('chatMsgs').scrollTop=$('chatMsgs').scrollHeight;setTimeout(()=>$('chatInput').focus(),300)}};
-$('chatBell').onclick=async()=>{if(!await ensureNotifyPermission())return;chatNotify=!chatNotify;localStorage.setItem('chatNotify',chatNotify?'1':'0');$('chatBell').classList.toggle('on',chatNotify);toast(chatNotify?'Сповіщення про повідомлення увімкнено ❤️':'Сповіщення про повідомлення вимкнено')};
-if(chatNotify)$('chatBell').classList.add('on');
+
 function stopTyping(){clearTimeout(window.typingTimer);const u=auth.currentUser;if(u)setDoc(doc(db,'chatTyping',u.uid),{typing:false,at:serverTimestamp()}).catch(()=>{})}
 $('chatInput').oninput=()=>{const u=auth.currentUser;if(!u)return;setDoc(doc(db,'chatTyping',u.uid),{typing:true,at:serverTimestamp()}).catch(()=>{});clearTimeout(window.typingTimer);window.typingTimer=setTimeout(stopTyping,2500)};
 $('chatForm').onsubmit=async e=>{e.preventDefault();const text=$('chatInput').value.trim();if(!text)return;$('chatInput').value='';stopTyping();
