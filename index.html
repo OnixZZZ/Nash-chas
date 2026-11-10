@@ -203,6 +203,10 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .notifyRow input::before{content:'';position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px #0003}
 .notifyRow input:checked{background:var(--wine)}
 .notifyRow input:checked::before{transform:translateX(16px)}
+.plTabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px;scrollbar-width:none}
+.plTab{flex:none;border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:7px 16px;font:600 13px var(--sans);color:var(--muted)}
+.plTab.on{background:var(--wine);color:#fff;border-color:var(--wine)}
+.plTab.plNew{border-style:dashed;color:var(--wine)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 </style>
@@ -256,7 +260,8 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 <div class="moodpick" id="moodPick"></div>
 <form id="moodForm" class="field" style="margin-top:12px"><textarea id="moodText" placeholder="За що я сьогодні вдячний(а)? (необов'язково)"></textarea><button class="btn small" type="submit" style="margin-top:8px">Зберегти настрій</button></form><p id="moodError" class="error"></p>
 <div class="sectionhead" style="margin-top:26px"><h2 style="font-size:22px">Стрічка</h2></div><div id="moodList" class="list"></div></section>
-<section class="view" id="view-music"><div class="sectionhead"><h2>Наша музика</h2></div>
+<section class="view" id="view-music"><div class="sectionhead"><h2 id="musicTitle">Наша музика</h2><button id="plDelete" class="btn danger small hidden">Видалити плейлист</button></div>
+<div id="plTabs" class="plTabs"></div>
 <div class="player"><div id="ytPlayer"></div><div id="nowPlaying" class="muted tiny">Оберіть трек зі списку ↓</div><div class="pctl"><button id="pPrev" class="btn light small">⏮ Попередній</button><button id="pPlay" class="btn small">▶ Відтворити</button><button id="pNext" class="btn light small">Наступний ⏭</button></div></div>
 <form id="trackForm" class="addtrack"><input id="trackUrl" type="url" placeholder="Встав посилання на YouTube…" required><button class="btn small" type="submit">+ Додати</button></form><p id="trackError" class="error"></p>
 <div id="playlistList" class="tracklist"></div></section>
@@ -290,9 +295,10 @@ xhr.ontimeout=()=>reject(Object.assign(Error('timeout'),{code:'timeout'}));
 xhr.send(fd)
 })}
 async function uploadVideo(file,onProgress){if(file.size>60*1024*1024)throw Error('toobig');return uploadToCloudinary(file,onProgress)}
-let data={moments:[],timers:[],dreams:[],letters:[],playlist:[],wishlist:[],movies:[],moods:[],presence:[],chat:[],chatReceipts:[],chatTyping:[]},unsubs=[],edit=null,photoData='',videoData='',srcImg=null,queue=[],vqueue=[],focusY=50,adj={b:100,c:100,s:100,r:0};
+let data={moments:[],timers:[],letters:[],playlist:[],playlists:[],wishlist:[],movies:[],moods:[],presence:[],chat:[],chatReceipts:[],chatTyping:[]},unsubs=[],edit=null,photoData='',videoData='',srcImg=null,queue=[],vqueue=[],focusY=50,adj={b:100,c:100,s:100,r:0};
 let chatOpen=false,chatLastMsgId=null,chatNotify=(localStorage.getItem('chatNotify')==='1');
 let presenceTimer=null,prevOnline={},presenceNotify=(localStorage.getItem('presenceNotify')==='1');
+let curPlaylistId=localStorage.getItem('curPlaylistId')||'';
 let whoFilter='mine';
 let ytPlayer=null,ytReady=false,curIdx=-1,remindOn=(localStorage.getItem('remindOn')==='1'),swReg=null;
 /* Скрипт YouTube підключаємо лише ПІСЛЯ того, як window.onYouTubeIframeAPIReady уже оголошено нижче — інакше можлива гонитва умов і плеєр не створюється взагалі */
@@ -342,7 +348,7 @@ let place='';try{const r=await fetch('https://ipapi.co/json/'),j=await r.json();
 addDoc(collection(db,'timers'),{visit:true,email:u.email||'',uid:u.uid,dev:dev+' · '+br,place,atMs:now(),createdAt:serverTimestamp()}).catch(e=>console.warn('visit',e))}
 let sc=0,st;$('secret').onclick=()=>{sc++;clearTimeout(st);st=setTimeout(()=>sc=0,2500);if(sc>=5&&auth.currentUser){sc=0;const v=data.timers.filter(x=>x.visit).sort((a,b)=>(b.atMs||0)-(a.atMs||0)).slice(0,80);$('visitsList').innerHTML=v.map(x=>`<div class="vrow"><b>${esc(shortName(x.email))}</b><span>${dateFmt(x.atMs)} · ${esc(x.dev||'')}${x.place?' · 📍 '+esc(x.place):''}</span></div>`).join('')||'<p class="muted">Поки порожньо.</p>';$('visitsBack').classList.remove('hidden')}};
 $('closeVisits').onclick=()=>$('visitsBack').classList.add('hidden');
-$('closeModal').onclick=$('cancelModal').onclick=closeModal;$('lightbox').onclick=()=>$('lightbox').classList.add('hidden');
+$('closeModal').onclick=$('cancelModal').onclick=closeModal;
 function closeModal(){$('modalBack').classList.add('hidden');$('itemForm').reset();edit=null;photoData='';videoData='';srcImg=null;queue=[];vqueue=[]}
 const loadImg=src=>new Promise((res,rej)=>{const im=new Image();im.onload=()=>res(im);im.onerror=rej;im.src=src});
 const setPv=()=>{const pv=$('pv');if(!pv)return;pv.innerHTML=photoData?`<img src="${attr(photoData)}" alt="" style="object-position:50% ${focusY}%">`:'';$('ed').classList.toggle('hidden',!photoData);$('edpix').classList.toggle('hidden',!srcImg);$('edpix').classList.toggle('nofilter',!('filter'in CanvasRenderingContext2D.prototype))};
@@ -376,12 +382,12 @@ if(kind==='photo'){const plist=queue.length>1?queue:(photoData&&!vqueue.includes
 try{for(const p of plist)await addDoc(collection(db,'timers'),{gallery:true,photo:p,focus:focusY,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
 for(const v of vlist)await addDoc(collection(db,'timers'),{gallery:true,video:v,createdAt:serverTimestamp(),updatedAt:serverTimestamp()});
 closeModal();toast('Додано ❤️')}catch(err){console.error(err);$('modalError').textContent='Не вдалося зберегти. Перевірте правила Firestore.'}return}
-if(kind==='item'){const ds=f.get('date'),ms=ds?new Date(ds).getTime():0;Object.assign(o,{dateMs:ms||null,place:f.get('place').trim(),text:f.get('text').trim(),photo:(f.get('photoUrl')||'').trim()||photoData||'',video:videoData||'',focus:focusY});if(col==='dreams')o.date=ds||''}
+if(kind==='item'){const ds=f.get('date'),ms=ds?new Date(ds).getTime():0;Object.assign(o,{dateMs:ms||null,place:f.get('place').trim(),text:f.get('text').trim(),photo:(f.get('photoUrl')||'').trim()||photoData||'',video:videoData||'',focus:focusY})}
 else Object.assign(o,{to:f.get('to'),text:f.get('text').trim(),unlock:f.get('unlock')||''});
 if(!o.title){$('modalError').textContent='Вкажіть назву.';return}
 try{id?await updateDoc(doc(db,col,id),o):await addDoc(collection(db,col),{...o,createdAt:serverTimestamp()});closeModal();toast('Збережено ❤️')}catch(err){console.error(err);$('modalError').textContent='Не вдалося зберегти. Можливо, фото завелике або потрібно оновити правила Firestore.'}};
 
-function renderAll(){const t=now(),all=['moments','timers','dreams'].flatMap(c=>data[c].map(x=>({...x,col:c,ms:getMs(x)}))).filter(i=>!i.gallery&&!i.visit),
+function renderAll(){const t=now(),all=['moments','timers'].flatMap(c=>data[c].map(x=>({...x,col:c,ms:getMs(x)}))).filter(i=>!i.gallery&&!i.visit),
 mem=all.filter(i=>i.ms&&i.ms<=t).sort((a,b)=>b.ms-a.ms),
 wish=all.filter(i=>!(i.ms&&i.ms<=t)).sort((a,b)=>(!!a.done-!!b.done)||((a.ms||9e15)-(b.ms||9e15))),first=mem[mem.length-1];
 if(first){$('togetherCount').textContent=Math.floor((t-first.ms)/864e5).toLocaleString('uk-UA');$('togetherHint').textContent='від «'+first.title+'»'}else{$('togetherCount').textContent='♡';$('togetherHint').textContent='Додайте перший спогад'}
@@ -421,13 +427,28 @@ window.onYouTubeIframeAPIReady=()=>{ytPlayer=new YT.Player('ytPlayer',{height:'1
 function playAt(i){const list=sortedPlaylist();if(!list.length)return;if(i<0)i=list.length-1;if(i>=list.length)i=0;curIdx=i;const t=list[i];if(ytReady&&ytPlayer){ytPlayer.loadVideoById(t.videoId);ytPlayer.playVideo()}$('nowPlaying').textContent='Зараз грає: '+(t.title||'YouTube трек');renderPlaylist()}
 $('pPlay').onclick=()=>{if(!ytReady)return;if(curIdx<0)return playAt(0);const st=ytPlayer.getPlayerState();st===1?ytPlayer.pauseVideo():ytPlayer.playVideo()};
 $('pNext').onclick=()=>playAt(curIdx+1);$('pPrev').onclick=()=>playAt(curIdx-1);
-const sortedPlaylist=()=>data.playlist.slice().sort((a,b)=>(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0));
-function renderPlaylist(){const list=sortedPlaylist();$('playlistList').innerHTML=list.map((t,i)=>`<div class="track${i===curIdx?' on':''}"><img src="${attr(t.thumb||('https://img.youtube.com/vi/'+t.videoId+'/mqdefault.jpg'))}" alt="" loading="lazy" onclick="playTrack('${t.id}')"><div class="tbody" onclick="playTrack('${t.id}')"><b>${esc(t.title||'YouTube трек')}</b>${t.author?`<span class="muted tiny">${esc(t.author)}</span>`:''}</div><button class="btn danger small" onclick="removeTrack('${t.id}')">✕</button></div>`).join('')||empty('Додайте першу спільну пісню ♡')}
+const sortedPlaylist=()=>data.playlist.filter(t=>(t.playlistId||'')===curPlaylistId).sort((a,b)=>(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0));
+function renderPlaylistTabs(){const all=data.playlists.slice().sort((a,b)=>(a.createdAt?.seconds||0)-(b.createdAt?.seconds||0));
+if(curPlaylistId&&!all.find(p=>p.id===curPlaylistId)){curPlaylistId='';localStorage.setItem('curPlaylistId','')}
+const cur=all.find(p=>p.id===curPlaylistId);
+$('musicTitle').textContent=cur?cur.name:'Наша музика';
+$('plDelete').classList.toggle('hidden',!cur);
+$('plTabs').innerHTML=[`<button class="plTab${!curPlaylistId?' on':''}" onclick="switchPlaylist('')">Усі треки</button>`,
+...all.map(p=>`<button class="plTab${p.id===curPlaylistId?' on':''}" onclick="switchPlaylist('${p.id}')">${esc(p.name)}</button>`),
+`<button class="plTab plNew" onclick="createPlaylist()">+ Створити</button>`].join('')}
+window.switchPlaylist=id=>{curPlaylistId=id;localStorage.setItem('curPlaylistId',id);curIdx=-1;renderPlaylistTabs();renderPlaylist()};
+window.createPlaylist=async()=>{const name=(prompt('Назва нового плейлиста:')||'').trim();if(!name)return;
+try{const ref=await addDoc(collection(db,'playlists'),{name,createdAt:serverTimestamp(),createdBy:auth.currentUser?.email||''});curPlaylistId=ref.id;localStorage.setItem('curPlaylistId',ref.id);toast('Плейлист створено ❤️')}catch(err){console.error(err);toast('Не вдалося створити плейлист')}};
+$('plDelete').onclick=async()=>{const p=data.playlists.find(x=>x.id===curPlaylistId);if(!p)return;
+if(!confirm(`Видалити плейлист «${p.name}»? Треки з нього не видаляться, а перейдуть в «Усі треки».`))return;
+try{const tracks=data.playlist.filter(t=>t.playlistId===curPlaylistId);await Promise.all(tracks.map(t=>updateDoc(doc(db,'playlist',t.id),{playlistId:''})));await deleteDoc(doc(db,'playlists',curPlaylistId));
+curPlaylistId='';localStorage.setItem('curPlaylistId','');toast('Плейлист видалено')}catch(err){console.error(err);toast('Не вдалося видалити плейлист')}};
+function renderPlaylist(){renderPlaylistTabs();const list=sortedPlaylist();$('playlistList').innerHTML=list.map((t,i)=>`<div class="track${i===curIdx?' on':''}"><img src="${attr(t.thumb||('https://img.youtube.com/vi/'+t.videoId+'/mqdefault.jpg'))}" alt="" loading="lazy" onclick="playTrack('${t.id}')"><div class="tbody" onclick="playTrack('${t.id}')"><b>${esc(t.title||'YouTube трек')}</b>${t.author?`<span class="muted tiny">${esc(t.author)}</span>`:''}</div><button class="btn danger small" onclick="removeTrack('${t.id}')">✕</button></div>`).join('')||empty('Додайте першу спільну пісню ♡')}
 window.playTrack=id=>{const list=sortedPlaylist(),i=list.findIndex(x=>x.id===id);if(i>-1)playAt(i)};
 window.removeTrack=async id=>{try{await deleteDoc(doc(db,'playlist',id))}catch(e){toast('Не вдалося видалити трек')}};
 $('trackForm').onsubmit=async e=>{e.preventDefault();$('trackError').textContent='';const url=$('trackUrl').value,vid=parseYtId(url);if(!vid){$('trackError').textContent='Не схоже на посилання YouTube.';return}
 let title='',author='',thumb='';try{const r=await fetch('https://www.youtube.com/oembed?format=json&url='+encodeURIComponent('https://www.youtube.com/watch?v='+vid));if(r.ok){const j=await r.json();title=j.title||'';author=j.author_name||'';thumb=j.thumbnail_url||''}}catch{}
-try{await addDoc(collection(db,'playlist'),{videoId:vid,url,title,author,thumb,addedBy:auth.currentUser?.email||'',createdAt:serverTimestamp()});$('trackUrl').value='';toast('Трек додано ❤️')}catch(err){console.error(err);$('trackError').textContent='Не вдалося зберегти трек.'}};
+try{await addDoc(collection(db,'playlist'),{videoId:vid,url,title,author,thumb,playlistId:curPlaylistId||'',addedBy:auth.currentUser?.email||'',createdAt:serverTimestamp()});$('trackUrl').value='';toast('Трек додано ❤️')}catch(err){console.error(err);$('trackError').textContent='Не вдалося зберегти трек.'}};
 
 /* ---- Нагадування (сповіщення браузера про мрії з наближеною датою) ---- */
 async function ensureNotifyPermission(){
