@@ -319,11 +319,13 @@ const translit=v=>[...v].map(c=>TRANSLIT[c]??c).join('');
 const toEmail=v=>{v=translit(v.trim().toLowerCase());return v.includes('@')?v:v+DOM},shortName=e=>(e||'?').replace(DOM,'');
 $('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';try{await signInWithEmailAndPassword(auth,toEmail($('email').value),$('password').value);$('password').value=''}catch(err){$('loginError').textContent=err.code==='auth/invalid-credential'?'Неправильний логін або пароль.':'Не вдалося увійти. Перевірте дані та інтернет.'}};
 $('logoutBtn').onclick=()=>signOut(auth);
-onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').classList.toggle('hidden',!!user);$('appPanel').classList.toggle('hidden',!user);$('chatWindow').classList.toggle('hidden',!user);if(!user){$('chatWindow').classList.add('collapsed');chatOpen=false}$('userLine').textContent=user?'Ви увійшли разом ♡':'';clearInterval(presenceTimer);chatLastMsgId=null;
+onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').classList.toggle('hidden',!!user);$('appPanel').classList.toggle('hidden',!user);$('chatWindow').classList.toggle('hidden',!user);if(!user){$('chatWindow').classList.add('collapsed');chatOpen=false}$('userLine').textContent=user?'Ви увійшли разом ♡':'';clearInterval(presenceTimer);document.removeEventListener('visibilitychange',presenceOnWake);window.removeEventListener('focus',presenceOnWake);window.removeEventListener('pageshow',presenceOnWake);chatLastMsgId=null;
 if(user){logVisit(user);for(const key of Object.keys(data)){unsubs.push(onSnapshot(collection(db,key),snap=>{data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));renderAll()},err=>{console.error(err);toast('Не вдалося завантажити '+key+'. Перевіримо правила доступу.')}))}
-touchPresence();presenceTimer=setInterval(touchPresence,25000)}
+touchPresence();presenceTimer=setInterval(touchPresence,25000)
+document.addEventListener('visibilitychange',presenceOnWake);window.addEventListener('focus',presenceOnWake);window.addEventListener('pageshow',presenceOnWake)}
 else{for(const k in data)data[k]=[];prevOnline={};renderAll()}});
 function touchPresence(){const u=auth.currentUser;if(!u)return;setDoc(doc(db,'presence',u.uid),{email:u.email||'',lastSeen:serverTimestamp()}).catch(()=>{})}
+function presenceOnWake(){if(document.visibilityState==='hidden')return;touchPresence();renderAll()}
 
 $('nav').onclick=e=>{const b=e.target.closest('button[data-view]');if(b)showView(b.dataset.view)};
 const GROUP_OF={moments:'story',dreams:'story',letters:'together',wishlist:'together',movies:'together',mood:'together',music:'media',gallery:'media'};
@@ -551,7 +553,7 @@ $('activityList').innerHTML=items.filter(x=>x.ms).sort((a,b)=>b.ms-a.ms).slice(0
 function presenceName(email){const n=shortName(email);return n?n.charAt(0).toUpperCase()+n.slice(1):'Партнер(ка)'}
 function renderPresence(){const uid=auth.currentUser?.uid,t=now();
 const others=data.presence.filter(p=>p.id!==uid);
-$('presenceLine').innerHTML=others.map(p=>{const ms=(p.lastSeen?.seconds||0)*1000,online=ms&&t-ms<60000;
+$('presenceLine').innerHTML=others.map(p=>{const ms=(p.lastSeen?.seconds||0)*1000,online=ms&&t-ms<90000;
 const prev=prevOnline[p.id];
 if(presenceNotify&&prev===false&&online)notify('Наш час ♡',presenceName(p.email)+' щойно відкрив(ла) сайт');
 prevOnline[p.id]=online;
