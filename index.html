@@ -321,9 +321,18 @@ let rndId=null,lastAll=[];
 /* Логін без пошти: Firebase вимагає email, тому до логіна дописується службовий домен */
 const DOM='@nashchas.invalid';
 const TRANSLIT={а:'a',б:'b',в:'v',г:'h',ґ:'g',д:'d',е:'e',є:'ie',ж:'zh',з:'z',и:'y',і:'i',ї:'i',й:'i',к:'k',л:'l',м:'m',н:'n',о:'o',п:'p',р:'r',с:'s',т:'t',у:'u',ф:'f',х:'kh',ц:'ts',ч:'ch',ш:'sh',щ:'shch',ю:'iu',я:'ia',ь:'',"'":'',"’":''};
+const SIMPLE={...TRANSLIT,є:'e',ї:'i',й:'i',х:'h',ц:'c',щ:'sh',ю:'u',я:'a',ж:'j'};
 const translit=v=>[...v].map(c=>TRANSLIT[c]??c).join('');
+const translitSimple=v=>[...v].map(c=>SIMPLE[c]??c).join('');
 const toEmail=v=>{v=translit(v.trim().toLowerCase());return v.includes('@')?v:v+DOM},shortName=e=>(e||'?').replace(DOM,'');
-$('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';try{await signInWithEmailAndPassword(auth,toEmail($('email').value),$('password').value);$('password').value=''}catch(err){$('loginError').textContent=err.code==='auth/invalid-credential'?'Неправильний логін або пароль.':'Не вдалося увійти. Перевірте дані та інтернет.'}};
+/* Кирилична назва може бути транслітерована по-різному (напр. «Марія» → mariia або maria) — пробуємо кілька природних варіантів написання логіна, а не лише один */
+function emailCandidates(raw){const v=raw.trim().toLowerCase();if(v.includes('@'))return[v];
+const cands=new Set([translit(v),translitSimple(v),v.replace(/['’ьъ]/g,'')]);
+return[...cands].map(c=>c+DOM)}
+$('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';const pw=$('password').value;let lastErr=null,ok=false;
+for(const em of emailCandidates($('email').value)){try{await signInWithEmailAndPassword(auth,em,pw);ok=true;break}catch(err){lastErr=err}}
+if(ok){$('password').value='';return}
+$('loginError').textContent=lastErr?.code==='auth/invalid-credential'?'Неправильний логін або пароль.':'Не вдалося увійти. Перевірте дані та інтернет.'};
 $('logoutBtn').onclick=()=>signOut(auth);
 onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').classList.toggle('hidden',!!user);$('appPanel').classList.toggle('hidden',!user);$('chatWindow').classList.toggle('hidden',!user);if(!user){$('chatWindow').classList.add('collapsed');chatOpen=false}$('userLine').textContent=user?'Ви увійшли разом ♡':'';clearInterval(presenceTimer);document.removeEventListener('visibilitychange',presenceOnWake);window.removeEventListener('focus',presenceOnWake);window.removeEventListener('pageshow',presenceOnWake);chatLastMsgId=null;
 if(user){logVisit(user);for(const key of Object.keys(data)){unsubs.push(onSnapshot(collection(db,key),snap=>{data[key]=snap.docs.map(d=>({id:d.id,...d.data()}));renderAll()},err=>{console.error(err);toast('Не вдалося завантажити '+key+'. Перевіримо правила доступу.')}))}
