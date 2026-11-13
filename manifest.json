@@ -1,6 +1,6 @@
 {
-  "name": "Наш час",
-  "short_name": "Наш час",
+  "name": "Наш маленький простір",
+  "short_name": "Наш простір",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
