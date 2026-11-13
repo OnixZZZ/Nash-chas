@@ -1,12 +1,12 @@
 <!doctype html>
 <html lang="uk">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#faf6f2"><title>Наш час ❤️</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#faf6f2"><title>Наш маленький простір ❤️</title>
 <link rel="manifest" href="manifest.json"><link rel="apple-touch-icon" href="apple-touch-icon.png"><link rel="icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-/* Наш час — «Романтичний журнал». Лише оформлення. */
+/* Наш маленький простір — «Романтичний журнал». Лише оформлення. */
 :root{--bg:#faf6f2;--ink:#2b2226;--muted:#8b7a80;--wine:#a83a5a;--rose:#f7e3e8;--gold:#c9a46c;--line:#ecdfd9;
 --shadow:0 12px 32px #6b2f4524;--serif:'Playfair Display',Georgia,serif;--sans:'Manrope',system-ui,sans-serif}
 *{box-sizing:border-box}
@@ -218,7 +218,7 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 
 </style>
 </head><body><main class="shell">
-<header class="brand"><div><div class="brandmark">Наш час ♡</div><small>спогади, які вже були, і мрії, до яких ми йдемо</small></div><div id="userLine" class="userline"></div></header>
+<header class="brand"><div><div class="brandmark">Наш маленький простір ♡</div><small>спогади, які вже були, і мрії, до яких ми йдемо</small></div><div id="userLine" class="userline"></div></header>
 <section id="loginPanel" class="panel login"><h1>Наш маленький простір ♡</h1><p class="muted tiny">Увійдіть, щоб зберігати вашу спільну історію.</p><form id="loginForm"><div class="field"><label>Логін</label><input id="email" type="text" autocomplete="username" autocapitalize="none" autocorrect="off" required></div><div class="field"><label>Пароль</label><input id="password" type="password" autocomplete="current-password" required></div><button id="loginSubmit" class="btn" style="width:100%">Увійти ❤️</button><p id="loginError" class="error"></p></form></section>
 <section id="appPanel" class="hidden"><div class="topline"><div class="muted tiny">Ваш простір для двох 💗</div><div class="notifyWrap"><button id="notifyBtn" class="btn light small">🔔</button><div id="notifyMenu" class="notifyMenu hidden">
 <label class="notifyRow"><span>Нагадування про мрії</span><input type="checkbox" id="notifyRemind"></label>
@@ -273,7 +273,7 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 <form id="trackForm" class="addtrack"><input id="trackUrl" type="url" placeholder="Встав посилання на YouTube…" required><button class="btn small" type="submit">+ Додати</button></form><p id="trackError" class="error"></p>
 <div id="playlistList" class="tracklist"></div></section>
 <section class="view" id="view-gallery"><div class="sectionhead"><h2>Наша галерея</h2><button class="btn small" data-add="photo">+ Додати фото</button></div><div id="galleryList" class="gallery"></div><p id="galleryEmpty" class="muted tiny"></p></section>
-</section><div class="footer">Створено з любов'ю для вас двох · Наш час <span id="secret">♡</span></div></main><div id="toast" class="toast hidden"></div>
+</section><div class="footer">Створено з любов'ю для вас двох · Наш маленький простір <span id="secret">♡</span></div></main><div id="toast" class="toast hidden"></div>
 <div id="modalBack" class="modalback hidden"><div class="modal"><div class="modalhead"><h2 id="modalTitle">Новий спогад</h2><button id="closeModal" class="btn light small">Закрити</button></div><form id="itemForm"><div id="modalFields"></div><p id="modalError" class="error"></p><div style="display:flex;gap:8px;margin-top:12px"><button class="btn" type="submit">Зберегти</button><button id="cancelModal" class="btn light" type="button">Скасувати</button></div></form></div></div>
 <div id="lightbox" class="modalback hidden"><img id="lbImg" alt=""><video id="lbVid" class="hidden" controls autoplay></video><button id="lbDel" class="btn danger small hidden">Видалити фото</button></div>
 <div id="chatWindow" class="chatWindow hidden collapsed">
@@ -498,7 +498,7 @@ chatNotify=e.target.checked;localStorage.setItem('chatNotify',chatNotify?'1':'0'
 function checkReminders(all,force){if(!remindOn||!('Notification'in window)||Notification.permission!=='granted')return;
 const today=new Date().toISOString().slice(0,10);if(!force&&localStorage.getItem('remindDay')===today)return;localStorage.setItem('remindDay',today);
 const t=now(),soon=all.filter(i=>!i.done&&i.ms&&i.ms>=t&&i.ms-t<=3*864e5);
-if(soon.length)notify('Наш час ♡',soon.map(i=>esc2(i.title)+' · '+dateFmt(i.ms)).slice(0,5).join('\n'))}
+if(soon.length)notify('Наш маленький простір ♡',soon.map(i=>esc2(i.title)+' · '+dateFmt(i.ms)).slice(0,5).join('\n'))}
 function esc2(s){return String(s??'')}
 
 
@@ -581,7 +581,7 @@ function renderPresence(){const uid=auth.currentUser?.uid,t=now();
 const others=data.presence.filter(p=>p.id!==uid);
 $('presenceLine').innerHTML=others.map(p=>{const ms=(p.lastSeen?.seconds||0)*1000,online=ms&&t-ms<90000;
 const prev=prevOnline[p.id];
-if(presenceNotify&&prev===false&&online)notify('Наш час ♡',presenceName(p.email)+' щойно відкрив(ла) сайт');
+if(presenceNotify&&prev===false&&online)notify('Наш маленький простір ♡',presenceName(p.email)+' щойно відкрив(ла) сайт');
 prevOnline[p.id]=online;
 return `<div class="presRow"><span class="dot${online?' on':''}"></span>${online?`<b>${esc(presenceName(p.email))} зараз тут ♡</b>`:`${esc(presenceName(p.email))} — востаннє ${ms?dateFmt(ms):'давно'}`}</div>`}).join('')||''}
 
@@ -645,7 +645,7 @@ const isTyping=theirTyping?.typing&&now()-typingAt<6000;
 $('chatTypingRow').classList.toggle('hidden',!isTyping);if(isTyping)$('chatTypingRow').textContent=presenceName(theirTyping.email)+' друкує…';
 if(chatOpen)$('chatMsgs').scrollTop=$('chatMsgs').scrollHeight;
 const newest=list[list.length-1];
-if(newest&&newest.id!==chatLastMsgId){if(chatLastMsgId!==null&&newest.uid!==uid&&chatNotify)notify('Наш час ♡','💬 '+(newest.text||(newest.photo?'Фото':newest.video?'Відео':newest.audio?'Голосове':'')).slice(0,80));chatLastMsgId=newest.id;if(chatOpen)touchChatRead()}
+if(newest&&newest.id!==chatLastMsgId){if(chatLastMsgId!==null&&newest.uid!==uid&&chatNotify)notify('Наш маленький простір ♡','💬 '+(newest.text||(newest.photo?'Фото':newest.video?'Відео':newest.audio?'Голосове':'')).slice(0,80));chatLastMsgId=newest.id;if(chatOpen)touchChatRead()}
 renderChatBadge()}
 
 function empty(t){return `<div class="empty"><b>♡</b>${t}</div>`}
