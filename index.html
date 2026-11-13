@@ -340,7 +340,9 @@ if(user){logVisit(user);for(const key of Object.keys(data)){unsubs.push(onSnapsh
 touchPresence();presenceTimer=setInterval(touchPresence,25000)
 document.addEventListener('visibilitychange',presenceOnWake);window.addEventListener('focus',presenceOnWake);window.addEventListener('pageshow',presenceOnWake)}
 else{for(const k in data)data[k]=[];prevOnline={};renderAll()}});
-function touchPresence(){const u=auth.currentUser;if(!u)return;setDoc(doc(db,'presence',u.uid),{email:u.email||'',lastSeen:serverTimestamp()}).catch(()=>{})}
+let presenceWarned=false;
+function touchPresence(){const u=auth.currentUser;if(!u)return;setDoc(doc(db,'presence',u.uid),{email:u.email||'',lastSeen:serverTimestamp()}).catch(err=>{console.error('presence write failed',err);
+if(!presenceWarned){presenceWarned=true;toast('Не вдалося оновити статус «на сайті». Перевірте правила Firestore для вашого акаунту.')}})}
 function presenceOnWake(){if(document.visibilityState==='hidden')return;touchPresence();renderAll()}
 
 $('nav').onclick=e=>{const b=e.target.closest('button[data-view]');if(b)showView(b.dataset.view)};
@@ -588,11 +590,11 @@ return `<div class="presRow"><span class="dot${online?' on':''}"></span>${online
 
 /* ---- Чат (у стилі месенджера: статус прочитання, «друкує…», редагування, видалення, фото, реакції) ---- */
 const csec=x=>(x.createdAt?.seconds||0)*1000;
-function touchChatRead(){const u=auth.currentUser;if(!u)return;setDoc(doc(db,'chatReceipts',u.uid),{lastReadAt:serverTimestamp()}).catch(()=>{})}
+function touchChatRead(){const u=auth.currentUser;if(!u)return;setDoc(doc(db,'chatReceipts',u.uid),{lastReadAt:serverTimestamp()}).catch(err=>console.error('chatReceipts write failed',err))}
 $('chatHead').onclick=()=>{chatOpen=!chatOpen;$('chatWindow').classList.toggle('collapsed',!chatOpen);if(chatOpen){touchChatRead();renderChatBadge();$('chatMsgs').scrollTop=$('chatMsgs').scrollHeight;setTimeout(()=>$('chatInput').focus(),300)}};
 
-function stopTyping(){clearTimeout(window.typingTimer);const u=auth.currentUser;if(u)setDoc(doc(db,'chatTyping',u.uid),{typing:false,at:serverTimestamp()}).catch(()=>{})}
-$('chatInput').oninput=()=>{const u=auth.currentUser;if(!u)return;setDoc(doc(db,'chatTyping',u.uid),{typing:true,at:serverTimestamp()}).catch(()=>{});clearTimeout(window.typingTimer);window.typingTimer=setTimeout(stopTyping,2500)};
+function stopTyping(){clearTimeout(window.typingTimer);const u=auth.currentUser;if(u)setDoc(doc(db,'chatTyping',u.uid),{typing:false,at:serverTimestamp()}).catch(err=>console.error('chatTyping write failed',err))}
+$('chatInput').oninput=()=>{const u=auth.currentUser;if(!u)return;setDoc(doc(db,'chatTyping',u.uid),{typing:true,at:serverTimestamp()}).catch(err=>console.error('chatTyping write failed',err));clearTimeout(window.typingTimer);window.typingTimer=setTimeout(stopTyping,2500)};
 $('chatForm').onsubmit=async e=>{e.preventDefault();const text=$('chatInput').value.trim();if(!text)return;$('chatInput').value='';stopTyping();
 try{await addDoc(collection(db,'chat'),{text,uid:auth.currentUser.uid,email:auth.currentUser.email||'',createdAt:serverTimestamp()})}catch(err){console.error(err);toast('Не вдалося надіслати повідомлення')}};
 $('chatAttach').onclick=()=>$('chatImgInput').click();
