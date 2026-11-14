@@ -330,9 +330,9 @@ const toEmail=v=>{v=translit(v.trim().toLowerCase());return v.includes('@')?v:v+
 function emailCandidates(raw){const v=raw.trim().toLowerCase();if(v.includes('@'))return[v];
 const cands=new Set([translit(v),translitSimple(v),v.replace(/['’ьъ]/g,'')]);
 return[...cands].map(c=>c+DOM)}
-$('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';const pw=$('password').value;let lastErr=null,ok=false;
+$('loginForm').onsubmit=async e=>{e.preventDefault();$('loginError').textContent='';const pw=$('password').value,typedName=$('email').value.trim();let lastErr=null,ok=false;
 for(const em of emailCandidates($('email').value)){try{await signInWithEmailAndPassword(auth,em,pw);ok=true;break}catch(err){lastErr=err}}
-if(ok){$('password').value='';return}
+if(ok){$('password').value='';if(typedName)localStorage.setItem('myDisplayName',typedName);return}
 $('loginError').textContent=lastErr?.code==='auth/invalid-credential'?'Неправильний логін або пароль.':'Не вдалося увійти. Перевірте дані та інтернет.'};
 $('logoutBtn').onclick=()=>signOut(auth);
 onAuthStateChanged(auth,user=>{unsubs.forEach(f=>f());unsubs=[];$('loginPanel').classList.toggle('hidden',!!user);$('appPanel').classList.toggle('hidden',!user);$('chatWindow').classList.toggle('hidden',!user);if(!user){$('chatWindow').classList.add('collapsed');chatOpen=false}$('userLine').textContent=user?'Ви увійшли разом ♡':'';clearInterval(presenceTimer);document.removeEventListener('visibilitychange',presenceOnWake);window.removeEventListener('focus',presenceOnWake);window.removeEventListener('pageshow',presenceOnWake);chatLastMsgId=null;
@@ -341,7 +341,7 @@ touchPresence();presenceTimer=setInterval(touchPresence,25000)
 document.addEventListener('visibilitychange',presenceOnWake);window.addEventListener('focus',presenceOnWake);window.addEventListener('pageshow',presenceOnWake)}
 else{for(const k in data)data[k]=[];prevOnline={};renderAll()}});
 let presenceWarned=false;
-function touchPresence(){const u=auth.currentUser;if(!u)return;setDoc(doc(db,'presence',u.uid),{email:u.email||'',lastSeen:serverTimestamp()}).catch(err=>{console.error('presence write failed',err);
+function touchPresence(){const u=auth.currentUser;if(!u)return;setDoc(doc(db,'presence',u.uid),{email:u.email||'',name:localStorage.getItem('myDisplayName')||'',lastSeen:serverTimestamp()}).catch(err=>{console.error('presence write failed',err);
 if(!presenceWarned){presenceWarned=true;toast('Не вдалося оновити статус «на сайті». Перевірте правила Firestore для вашого акаунту.')}})}
 function presenceOnWake(){if(document.visibilityState==='hidden')return;touchPresence();renderAll()}
 
@@ -578,18 +578,18 @@ $('activityList').innerHTML=items.filter(x=>x.ms).sort((a,b)=>b.ms-a.ms).slice(0
 
 
 /* ---- Хтось зараз на сайті ---- */
-function presenceName(email){const n=shortName(email);return n?n.charAt(0).toUpperCase()+n.slice(1):'Партнер(ка)'}
+function presenceName(email,name){if(name)return name.charAt(0).toUpperCase()+name.slice(1);const n=shortName(email);return n?n.charAt(0).toUpperCase()+n.slice(1):'Партнер(ка)'}
 function renderPresence(){const uid=auth.currentUser?.uid,t=now();
 /* Може існувати кілька акаунтів тієї самої людини (різні логіни) — показуємо лише
    найсвіжіший запис, щоб застарілий акаунт, яким уже не користуються, не плутав і не дублював рядок */
 const others=data.presence.filter(p=>p.id!==uid);
 others.forEach(p=>{const ms=(p.lastSeen?.seconds||0)*1000,online=ms&&t-ms<90000,prev=prevOnline[p.id];
-if(presenceNotify&&prev===false&&online)notify('Наш маленький простір ♡',presenceName(p.email)+' щойно відкрив(ла) сайт');
+if(presenceNotify&&prev===false&&online)notify('Наш маленький простір ♡',presenceName(p.email,p.name)+' щойно відкрив(ла) сайт');
 prevOnline[p.id]=online});
 const latest=others.slice().sort((a,b)=>(b.lastSeen?.seconds||0)-(a.lastSeen?.seconds||0))[0];
 if(!latest){$('presenceLine').innerHTML='';return}
 const ms=(latest.lastSeen?.seconds||0)*1000,online=ms&&t-ms<90000;
-$('presenceLine').innerHTML=`<div class="presRow"><span class="dot${online?' on':''}"></span>${online?`<b>${esc(presenceName(latest.email))} зараз тут ♡</b>`:`${esc(presenceName(latest.email))} — востаннє ${ms?dateFmt(ms):'давно'}`}</div>`}
+$('presenceLine').innerHTML=`<div class="presRow"><span class="dot${online?' on':''}"></span>${online?`<b>Твій партнер зараз тут ♡</b>`:`${esc(presenceName(latest.email,latest.name))} — востаннє ${ms?dateFmt(ms):'давно'}`}</div>`}
 
 
 /* ---- Чат (у стилі месенджера: статус прочитання, «друкує…», редагування, видалення, фото, реакції) ---- */
@@ -597,8 +597,8 @@ const csec=x=>(x.createdAt?.seconds||0)*1000;
 function touchChatRead(){const u=auth.currentUser;if(!u)return;setDoc(doc(db,'chatReceipts',u.uid),{lastReadAt:serverTimestamp()}).catch(err=>console.error('chatReceipts write failed',err))}
 $('chatHead').onclick=()=>{chatOpen=!chatOpen;$('chatWindow').classList.toggle('collapsed',!chatOpen);if(chatOpen){touchChatRead();renderChatBadge();$('chatMsgs').scrollTop=$('chatMsgs').scrollHeight;setTimeout(()=>$('chatInput').focus(),300)}};
 
-function stopTyping(){clearTimeout(window.typingTimer);const u=auth.currentUser;if(u)setDoc(doc(db,'chatTyping',u.uid),{typing:false,at:serverTimestamp()}).catch(err=>console.error('chatTyping write failed',err))}
-$('chatInput').oninput=()=>{const u=auth.currentUser;if(!u)return;setDoc(doc(db,'chatTyping',u.uid),{typing:true,at:serverTimestamp()}).catch(err=>console.error('chatTyping write failed',err));clearTimeout(window.typingTimer);window.typingTimer=setTimeout(stopTyping,2500)};
+function stopTyping(){clearTimeout(window.typingTimer);const u=auth.currentUser;if(u)setDoc(doc(db,'chatTyping',u.uid),{typing:false,at:serverTimestamp(),name:localStorage.getItem('myDisplayName')||''}).catch(err=>console.error('chatTyping write failed',err))}
+$('chatInput').oninput=()=>{const u=auth.currentUser;if(!u)return;setDoc(doc(db,'chatTyping',u.uid),{typing:true,at:serverTimestamp(),name:localStorage.getItem('myDisplayName')||''}).catch(err=>console.error('chatTyping write failed',err));clearTimeout(window.typingTimer);window.typingTimer=setTimeout(stopTyping,2500)};
 $('chatForm').onsubmit=async e=>{e.preventDefault();const text=$('chatInput').value.trim();if(!text)return;$('chatInput').value='';stopTyping();
 try{await addDoc(collection(db,'chat'),{text,uid:auth.currentUser.uid,email:auth.currentUser.email||'',createdAt:serverTimestamp()})}catch(err){console.error(err);toast('Не вдалося надіслати повідомлення')}};
 $('chatAttach').onclick=()=>$('chatImgInput').click();
@@ -648,7 +648,7 @@ ${hc?`<button class="cheart${myHeart?' mine':''}" onclick="toggleHeart('${m.id}'
 $('chatMsgs').innerHTML=html||`<p class="muted tiny" style="padding:20px;text-align:center">Напишіть перше повідомлення ♡</p>`;
 const theirTyping=data.chatTyping.find(t=>t.id&&t.id!==uid),typingAt=(theirTyping?.at?.seconds||0)*1000;
 const isTyping=theirTyping?.typing&&now()-typingAt<6000;
-$('chatTypingRow').classList.toggle('hidden',!isTyping);if(isTyping)$('chatTypingRow').textContent=presenceName(theirTyping.email)+' друкує…';
+$('chatTypingRow').classList.toggle('hidden',!isTyping);if(isTyping)$('chatTypingRow').textContent=presenceName(theirTyping.email,theirTyping.name)+' друкує…';
 if(chatOpen)$('chatMsgs').scrollTop=$('chatMsgs').scrollHeight;
 const newest=list[list.length-1];
 if(newest&&newest.id!==chatLastMsgId){if(chatLastMsgId!==null&&newest.uid!==uid&&chatNotify)notify('Наш маленький простір ♡','💬 '+(newest.text||(newest.photo?'Фото':newest.video?'Відео':newest.audio?'Голосове':'')).slice(0,80));chatLastMsgId=newest.id;if(chatOpen)touchChatRead()}
