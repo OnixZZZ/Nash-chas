@@ -580,12 +580,16 @@ $('activityList').innerHTML=items.filter(x=>x.ms).sort((a,b)=>b.ms-a.ms).slice(0
 /* ---- Хтось зараз на сайті ---- */
 function presenceName(email){const n=shortName(email);return n?n.charAt(0).toUpperCase()+n.slice(1):'Партнер(ка)'}
 function renderPresence(){const uid=auth.currentUser?.uid,t=now();
+/* Може існувати кілька акаунтів тієї самої людини (різні логіни) — показуємо лише
+   найсвіжіший запис, щоб застарілий акаунт, яким уже не користуються, не плутав і не дублював рядок */
 const others=data.presence.filter(p=>p.id!==uid);
-$('presenceLine').innerHTML=others.map(p=>{const ms=(p.lastSeen?.seconds||0)*1000,online=ms&&t-ms<90000;
-const prev=prevOnline[p.id];
+others.forEach(p=>{const ms=(p.lastSeen?.seconds||0)*1000,online=ms&&t-ms<90000,prev=prevOnline[p.id];
 if(presenceNotify&&prev===false&&online)notify('Наш маленький простір ♡',presenceName(p.email)+' щойно відкрив(ла) сайт');
-prevOnline[p.id]=online;
-return `<div class="presRow"><span class="dot${online?' on':''}"></span>${online?`<b>${esc(presenceName(p.email))} зараз тут ♡</b>`:`${esc(presenceName(p.email))} — востаннє ${ms?dateFmt(ms):'давно'}`}</div>`}).join('')||''}
+prevOnline[p.id]=online});
+const latest=others.slice().sort((a,b)=>(b.lastSeen?.seconds||0)-(a.lastSeen?.seconds||0))[0];
+if(!latest){$('presenceLine').innerHTML='';return}
+const ms=(latest.lastSeen?.seconds||0)*1000,online=ms&&t-ms<90000;
+$('presenceLine').innerHTML=`<div class="presRow"><span class="dot${online?' on':''}"></span>${online?`<b>${esc(presenceName(latest.email))} зараз тут ♡</b>`:`${esc(presenceName(latest.email))} — востаннє ${ms?dateFmt(ms):'давно'}`}</div>`}
 
 
 /* ---- Чат (у стилі месенджера: статус прочитання, «друкує…», редагування, видалення, фото, реакції) ---- */
