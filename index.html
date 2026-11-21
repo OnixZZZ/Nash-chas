@@ -158,9 +158,14 @@ h3{margin:0 0 4px;font:700 22px/1.25 var(--serif)}
 .qa-track .qaIcon{background:#cdeedd}
 .qa-wish .qaIcon{background:#ffdcc7}
 .qa-movie .qaIcon{background:#d9ecff}
-.activity{display:grid;gap:8px;margin-bottom:6px}
-.arow{display:flex;align-items:center;gap:12px;padding:12px 16px;background:#fff;border:1px solid var(--line);border-radius:16px;font-size:14px}
-.aicon{font-size:18px;flex:none}
+.activity{display:grid;gap:10px;margin-bottom:6px}
+.arow{display:flex;align-items:center;gap:14px;padding:12px 16px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)}
+.aicon{width:40px;height:40px;flex:none;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--rose)}
+.ai-dream .aicon{background:#fff0b8}.ai-letter .aicon{background:#e4dcfd}.ai-wish .aicon{background:#ffdcc7}
+.ai-movie .aicon{background:#d9ecff}.ai-track .aicon{background:#cdeedd}.ai-mood .aicon{background:#eee6f6}
+.abody{min-width:0;flex:1}
+.atitle{font:600 14px var(--sans);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ameta{font-size:12px;color:var(--muted);margin-top:2px}
 #presenceLine{margin:4px 0 18px}
 .presRow{display:flex;align-items:center;gap:9px;padding:10px 16px;background:#fff;border:1px solid var(--line);border-radius:99px;font-size:14px;width:fit-content}
 .dot{width:9px;height:9px;border-radius:50%;background:#c9c0c3;flex:none}
@@ -415,7 +420,7 @@ let mt='',ma='';try{const r=await fetch('https://www.youtube.com/oembed?format=j
 Object.assign(o,{musicId:vid,musicTitle:mt,musicAuthor:ma})}}}
 else Object.assign(o,{to:f.get('to'),text:f.get('text').trim(),unlock:f.get('unlock')||''});
 if(!o.title){$('modalError').textContent='Вкажіть назву.';return}
-try{id?await updateDoc(doc(db,col,id),o):await addDoc(collection(db,col),{...o,createdAt:serverTimestamp()});closeModal();toast('Збережено ❤️')}catch(err){console.error(err);$('modalError').textContent='Не вдалося зберегти. Можливо, фото завелике або потрібно оновити правила Firestore.'}};
+try{id?await updateDoc(doc(db,col,id),o):await addDoc(collection(db,col),{...o,addedBy:auth.currentUser?.email||'',addedByName:localStorage.getItem('myDisplayName')||'',createdAt:serverTimestamp()});closeModal();toast('Збережено ❤️')}catch(err){console.error(err);$('modalError').textContent='Не вдалося зберегти. Можливо, фото завелике або потрібно оновити правила Firestore.'}};
 
 function renderAll(){const t=now(),all=['moments','timers'].flatMap(c=>data[c].map(x=>({...x,col:c,ms:getMs(x)}))).filter(i=>!i.gallery&&!i.visit),
 mem=all.filter(i=>i.ms&&i.ms<=t).sort((a,b)=>b.ms-a.ms),
@@ -483,7 +488,7 @@ window.playTrack=id=>{const list=sortedPlaylist(),i=list.findIndex(x=>x.id===id)
 window.removeTrack=async id=>{try{await deleteDoc(doc(db,'playlist',id))}catch(e){toast('Не вдалося видалити трек')}};
 $('trackForm').onsubmit=async e=>{e.preventDefault();$('trackError').textContent='';const url=$('trackUrl').value,vid=parseYtId(url);if(!vid){$('trackError').textContent='Не схоже на посилання YouTube.';return}
 let title='',author='',thumb='';try{const r=await fetch('https://www.youtube.com/oembed?format=json&url='+encodeURIComponent('https://www.youtube.com/watch?v='+vid));if(r.ok){const j=await r.json();title=j.title||'';author=j.author_name||'';thumb=j.thumbnail_url||''}}catch{}
-try{await addDoc(collection(db,'playlist'),{videoId:vid,url,title,author,thumb,playlistId:curPlaylistId||'',addedBy:auth.currentUser?.email||'',createdAt:serverTimestamp()});$('trackUrl').value='';toast('Трек додано ❤️')}catch(err){console.error(err);$('trackError').textContent='Не вдалося зберегти трек.'}};
+try{await addDoc(collection(db,'playlist'),{videoId:vid,url,title,author,thumb,playlistId:curPlaylistId||'',addedBy:auth.currentUser?.email||'',addedByName:localStorage.getItem('myDisplayName')||'',createdAt:serverTimestamp()});$('trackUrl').value='';toast('Трек додано ❤️')}catch(err){console.error(err);$('trackError').textContent='Не вдалося зберегти трек.'}};
 
 /* ---- Нагадування (сповіщення браузера про мрії з наближеною датою) ---- */
 async function ensureNotifyPermission(){
@@ -531,7 +536,7 @@ window.rateMovie=async id=>{const r=prompt('Оцінка від 1 до 5:','5');
 window.unwatchMovie=async id=>{try{await updateDoc(doc(db,'movies',id),{watched:false,rating:null})}catch(e){toast('Не вдалося оновити')}};
 window.removeMovie=async id=>{if(!confirm('Видалити фільм зі списку?'))return;try{await deleteDoc(doc(db,'movies',id))}catch(e){toast('Не вдалося видалити')}};
 $('movieForm').onsubmit=async e=>{e.preventDefault();$('movieError').textContent='';const title=$('movieTitle').value.trim();if(!title)return;
-try{await addDoc(collection(db,'movies'),{title,watched:false,rating:null,addedBy:auth.currentUser?.email||'',createdAt:serverTimestamp()});e.target.reset();toast('Додано ❤️')}catch(err){console.error(err);$('movieError').textContent='Не вдалося зберегти.'}};
+try{await addDoc(collection(db,'movies'),{title,watched:false,rating:null,addedBy:auth.currentUser?.email||'',addedByName:localStorage.getItem('myDisplayName')||'',createdAt:serverTimestamp()});e.target.reset();toast('Додано ❤️')}catch(err){console.error(err);$('movieError').textContent='Не вдалося зберегти.'}};
 
 /* ---- Настрій і вдячність ---- */
 const MOODS=['🥰','😊','🙂','😐','😔','😢','😤'],todayKey=()=>new Date().toISOString().slice(0,10);
@@ -572,14 +577,22 @@ if(k==='movie'){showView('movies');setTimeout(()=>$('movieTitle')?.focus(),250);
 };
 
 /* ---- Стрічка останньої активності ---- */
+function relTime(ms){const d=now()-ms,sdiff=Math.floor(d/1000);
+if(sdiff<60)return 'щойно';const mn=Math.floor(sdiff/60);if(mn<60)return mn+' хв тому';
+const hr=Math.floor(mn/60);if(hr<24)return hr+' год тому';
+const days=Math.floor(hr/24);if(days===1)return 'вчора';if(days<7)return days+' дн тому';
+return new Intl.DateTimeFormat('uk-UA',{day:'numeric',month:'long',timeZone:'Europe/Kyiv'}).format(new Date(ms))}
+function whoLabel(addedBy,addedByName){if(addedByName)return addedByName.charAt(0).toUpperCase()+addedByName.slice(1);
+if(addedBy&&addedBy===auth.currentUser?.email)return 'Ви';if(addedBy)return 'Партнер(ка)';return ''}
 function renderActivity(all){const uid=auth.currentUser?.uid,items=[];
-const sec=x=>x.createdAt?.seconds||0;
-all.forEach(i=>items.push({ms:sec(i),icon:i.ms&&i.ms<=now()?'📸':'✨',text:(i.ms&&i.ms<=now()?'Новий спогад: ':'Нова мрія: ')+i.title}));
-data.letters.forEach(l=>items.push({ms:sec(l),icon:'💌',text:'Новий лист для '+(l.to||'нас обох')}));
-data.wishlist.forEach(w=>items.push({ms:sec(w),icon:'🎁',text:(w.owner===uid?'Ви додали бажання':'Партнер додав(ла) бажання')}));
-data.movies.forEach(m=>items.push({ms:sec(m),icon:'🎬',text:'Додано фільм: '+m.title}));
-data.playlist.forEach(t=>items.push({ms:sec(t),icon:'🎵',text:'Новий трек: '+(t.title||'YouTube')}));
-$('activityList').innerHTML=items.filter(x=>x.ms).sort((a,b)=>b.ms-a.ms).slice(0,6).map(x=>`<div class="arow"><span class="aicon">${x.icon}</span><span>${esc(x.text)}</span></div>`).join('')||empty('Тут з’являтиметься все нове, що ви додасте ♡')}
+const sec=x=>(x.createdAt?.seconds||0)*1000;
+all.forEach(i=>items.push({ms:sec(i),icon:i.ms&&i.ms<=now()?'📸':'✨',cls:i.ms&&i.ms<=now()?'ai-mem':'ai-dream',text:(i.ms&&i.ms<=now()?'Новий спогад: ':'Нова мрія: ')+i.title,who:whoLabel(i.addedBy,i.addedByName)}));
+data.letters.forEach(l=>items.push({ms:sec(l),icon:'💌',cls:'ai-letter',text:'Новий лист для '+(l.to||'нас обох'),who:whoLabel(l.addedBy,l.addedByName)}));
+data.wishlist.forEach(w=>items.push({ms:sec(w),icon:'🎁',cls:'ai-wish',text:'Нове бажання: '+w.title,who:w.owner===uid?'Ви':'Партнер(ка)'}));
+data.movies.forEach(m=>items.push({ms:sec(m),icon:'🎬',cls:'ai-movie',text:'Додано фільм: '+m.title,who:whoLabel(m.addedBy,m.addedByName)}));
+data.playlist.forEach(t=>items.push({ms:sec(t),icon:'🎵',cls:'ai-track',text:'Новий трек: '+(t.title||'YouTube'),who:whoLabel(t.addedBy,t.addedByName)}));
+data.moods.forEach(md=>items.push({ms:(md.updatedAt?.seconds||0)*1000,icon:md.mood||'💭',cls:'ai-mood',text:(md.uid===uid?'Ви відмітили':'Партнер(ка) відмітив(ла)')+' настрій',who:''}));
+$('activityList').innerHTML=items.filter(x=>x.ms).sort((a,b)=>b.ms-a.ms).slice(0,8).map(x=>`<div class="arow ${x.cls}"><span class="aicon">${x.icon}</span><div class="abody"><div class="atitle">${esc(x.text)}</div><div class="ameta">${x.who?esc(x.who)+' · ':''}${relTime(x.ms)}</div></div></div>`).join('')||empty('Тут з’являтиметься все нове, що ви додасте ♡')}
 
 
 /* ---- Хтось зараз на сайті ---- */
